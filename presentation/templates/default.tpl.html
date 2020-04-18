@@ -1,0 +1,25 @@
+<?php if ($connected) : ?>
+	<h4 id="LoginLabel"" style="margin-bottom: 20px;"><i class="glyphicon glyphicon-user"></i>&nbsp;<?php echo _t('LOGIN_CONNECTED_AS').' '.$user; ?></h4>
+	<?php echo $PageMenuUser; ?>
+	<ul class="login-actions">
+	  <li><a href="<?php echo $incomingurl; ?>&amp;action=logout" class="login-signout-link" title="<?php echo _t('LOGIN_LOGOUT'); ?>"><?php echo _t('LOGIN_LOGOUT'); ?></a></li>
+	</ul>
+<?php else : ?>
+	<?php if ($error) : ?>
+	  <div class="alert alert-danger"><button type="button" class="close" data-dismiss="alert">&times;</button><?php echo $error; ?></div>
+	<?php endif; ?>
+	<div id="ConnectionDetails">
+		<?php echo $ConnectionDetails; ?>
+	</div>
+	<div class="provider-container" style="display: flex; justify-content: center; margin-top: 20px">
+		<ul class="list-inline provider-list">
+			<?php foreach ($ssoHosts as $id => $confEntry) : ?>
+			<li class="provider-item" style="padding-top: 10px;">
+				<a class="<?php echo $confEntry['style']['button_class']; ?> list-inline" href="<?php echo $incomingurl; ?>&amp;action=connectOAUTH&provider=<?php echo $id; ?>" title="<?php echo _t('SSO_CONNECT'); ?>">
+					<i class="<?php echo $confEntry['style']['button_icon']; ?>"></i> <?php echo $confEntry['style']['button_label']; ?>
+				</a>
+			</li>
+			<?php endforeach; ?>
+		</ul>
+	</div>
+<?php endif; ?>
