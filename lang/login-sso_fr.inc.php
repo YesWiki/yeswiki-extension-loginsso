@@ -26,7 +26,10 @@ $GLOBALS['translations'] = array_merge(
         'SSO_CONNECT_REQUIRED' => 'Une connexion est requise pour voir la page.',
         'SSO_SEE_USER_PROFIL' => 'Consulter mon profil',
         'SSO_SEE_USER_ENTRIES' => 'Voir mes fiches',
+        // same msg exists in bazar : BAZ_VOIR_VOS_FICHES
         'SSO_USER_ENTRIES' => 'Mes fiches',
-        'SSO_USER_NOT_FOUND' => 'Erreur dans l\'affichage des fiches. L\'utilisateur suivant n\'existe pas : '
+        'SSO_USER_NOT_FOUND' => 'Erreur dans l\'affichage des fiches. L\'utilisateur suivant n\'existe pas : ',
+        // same msg exists in bazar : BAZ_PAS_DE_FICHES_SAUVEES_EN_VOTRE_NOM
+        'SSO_NO_USER_ENTRIES' => 'Vous n\'avez aucune fiche enregistr&eacute;e pour l\'instant.'
     )
 );

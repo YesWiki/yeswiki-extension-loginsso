@@ -34,10 +34,19 @@ if (!$this->LoadUser($username)) {
     if (empty($GLOBALS['_BAZAR_']['templates'])) {
         $GLOBALS['_BAZAR_']['templates'] = $GLOBALS['wiki']->config['default_bazar_template'];
     }
-    // TODO remove the user entry from the results
+
     $tableau_dernieres_fiches = baz_requete_recherche_fiches('', '', '', '', 1, addslashes($username));
+    // remove the user entry from the results if a bazar_user_entry_id is defined in the config
+    if (!empty($this->config['sso_config']['bazar_user_entry_id'])) {
+        foreach ($tableau_dernieres_fiches as $index => $fiche) {
+            if (preg_match('/.*"id_typeannonce":"' . $this->config['sso_config']['bazar_user_entry_id'] . '".*/', $fiche['body']))
+                unset($tableau_dernieres_fiches[$index]);
+        }
+    }
     if (count($tableau_dernieres_fiches) > 0) {
         $params = getAllParameters($this);
         echo displayResultList($tableau_dernieres_fiches, $params, true);
+    } else {
+        echo '<div class="alert alert-info">' . _t('SSO_NO_USER_ENTRIES') . '</div>' . "\n";
     }
 }
