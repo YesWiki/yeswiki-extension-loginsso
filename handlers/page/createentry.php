@@ -19,48 +19,75 @@ require_once 'tools/login-sso/libs/login-sso.lib.php';
 ob_start();
 
 if (isset($_GET['attr'])) {
-    $auth = unserialize(rawurldecode($_GET['attr']));
+    $ssoUser = unserialize(rawurldecode($_GET['attr']));
 }
 // check if all the parameters are well defined
-if ($this->GetUser() && $auth && isset($_GET['provider']) && isset($_GET['username'])) {
+if ($this->GetUser() && $ssoUser && isset($_GET['provider']) && isset($_GET['username'])) {
 
-    $bazar = $this->config['sso_config']['hosts'][$_GET['provider']]['bazar_mapping'];
+    $bazarMapping = $this->config['sso_config']['providers'][$_GET['provider']]['bazar_mapping'];
 
     if (!checkBazarMappingConfig($this->config, $_GET['provider'])){
         echo '<div class="alert alert-danger">' . _t('SSO_CONFIG_ERROR') . '</div>';
     } else {
         // if no entry of the 'id' type and with the 'username' owner, this is the first connexion and the entry have to be created
-        if (!bazarEntryExists($this->config['sso_config']['bazar_user_entry_id'], $_GET['username'])) {
+        if (!bazarUserEntryExists($this->config['sso_config']['bazar_user_entry_id'], $_GET['username'])) {
+
+            // alert message if
+            if (isset($_GET['old_user_updated']) && $_GET['old_user_updated'])
+                echo '<div class="alert alert-warning">' . _t('SSO_OLD_USER_UPDATED') . '</div><br/>';
 
             if (!isset($_GET['choice'])) {
                 // first display, inform the user and ask the consent question if the anonymize function is configured
                 echo '<h2>' . _t('SSO_ENTRY_CREATE') . '</h2><br>';
-                echo '<p class="entry_user_information">' . $bazar['entry_creation_information'] . '</p>';
-                if (!empty($bazar['anonymize'])){
-                    echo '<p><div class="user_consent_question">' . $bazar['anonymize']['consent_question'] . '</div>';
+                echo '<p class="entry_user_information">' . $bazarMapping['entry_creation_information'] . '</p>';
+                if (!empty($bazarMapping['anonymize'])){
+                    echo '<p><div class="user_consent_question">' . $bazarMapping['anonymize']['consent_question'] . '</div>';
                     echo '<br><a href="' . $this->href('createentry', '', 'choice=yes&' . 'provider=' . $_GET['provider'] . '&username=' . $_GET['username']
-                            . '&attr=' . rawurlencode(serialize($auth)), false) . '" class="btn btn-primary">' . _t('SSO_YES_CONSENT') . '</a> ou '
+                            . '&attr=' . rawurlencode(serialize($ssoUser)), false) . '" class="btn btn-primary">' . _t('SSO_YES_CONSENT') . '</a> ou '
                         . '<a href="' . $this->href('createentry', '', 'choice=no&' . 'provider=' . $_GET['provider'] . '&username=' . $_GET['username']
-                            . '&attr=' . rawurlencode(serialize($auth)), false) . '" class="btn btn-default">' . _t('SSO_NO_CONSENT') . '</a>';
+                            . '&attr=' . rawurlencode(serialize($ssoUser)), false) . '" class="btn btn-default">' . _t('SSO_NO_CONSENT') . '</a>';
                     echo '</p><br><br>';
                 } else {
                     echo '<br><a href="' . $this->href('createentry', '', 'choice=yes&' . 'provider=' . $_GET['provider'] . '&username=' . $_GET['username']
-                            . '&attr=' . rawurlencode(serialize($auth)), false) . '" class="btn btn-primary">' . _t('SSO_OK_ENTRY_CREATION') . '</a>';
+                            . '&attr=' . rawurlencode(serialize($ssoUser)), false) . '" class="btn btn-primary">' . _t('SSO_OK_ENTRY_CREATION') . '</a>';
                     echo '</p><br><br>';
                 }
             } else {
                 // if the user have already click on a button
                 $anonymous = $_GET['choice']=='yes' ? false : true;
-                $fiche = createBazarEntry($bazar, $this->config['sso_config']['bazar_user_entry_id'], $auth, $anonymous);
+                $fiche = createUserBazarEntry($bazarMapping, $this->config['sso_config']['bazar_user_entry_id'],
+                    $this->config['sso_config']['providers'][$_GET['provider']]['user_fields']['user_title_format'], $ssoUser, $anonymous);
                 if (!empty($fiche)) {
                     include_once 'tools/bazar/libs/bazar.fonct.php';
-                    $fiche = baz_insertion_fiche($fiche);
+
+                    if (!$anonymous) {
+                        $fiche['id_fiche'] = $_GET['username'];
+                        $fiche = baz_insertion_fiche($fiche);
+                    }
+                    else {
+                        $entryId = genere_nom_user($fiche['bf_titre']);
+                        // in case of an anonymized user, update the username with the entry id and save the entry with this user
+                        $this->Query(
+                            "UPDATE " . $this->config["table_prefix"] . "users SET " .
+                            "name = '" . mysqli_real_escape_string($this->dblink,  $entryId) . "', " .
+                            "password = 'sso' " .
+                            "WHERE name = '" . mysqli_real_escape_string($this->dblink, $_GET['username']) . "'"
+                        );
+
+                        // refresh the user
+                        $user = $this->LoadUser($entryId);
+                        $this->SetUser($user, true);
+
+                        // save the entry with the new username
+                        $fiche['id_fiche'] = $entryId;
+                        $fiche = baz_insertion_fiche($fiche);
+                    }
 
                     // set the read access of the entry ('+' by default)
-                    $readAccess = isset($bazar['read_access_entry']) ? $bazar['read_access_entry'] : '+';
+                    $readAccess = isset($bazarMapping['read_access_entry']) ? $bazarMapping['read_access_entry'] : '+';
                     $GLOBALS['wiki']->SaveAcl($fiche['id_fiche'], 'read', $readAccess);
                     // set the write access of the entry ('%' by default)
-                    $writeAccess = isset($bazar['write_access_entry']) ? $bazar['write_access_entry'] : '%';
+                    $writeAccess = isset($bazarMapping['write_access_entry']) ? $bazarMapping['write_access_entry'] : '%';
                     $GLOBALS['wiki']->SaveAcl($fiche['id_fiche'], 'write', $writeAccess);
 
                     $this->redirect($this->href('', $fiche['id_fiche']));

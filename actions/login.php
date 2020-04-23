@@ -17,7 +17,7 @@ if (!defined('WIKINI_VERSION')) {
 // Load the login-sso lib
 require_once 'tools/login-sso/libs/login-sso.lib.php';
 
-if (!empty($this->config['sso_config']) && !empty($this->config['sso_config']['hosts'])) {
+if (!empty($this->config['sso_config']) && !empty($this->config['sso_config']['providers'])) {
 
     // Lecture des parametres de l'action
     // classe css pour l'action
@@ -61,7 +61,7 @@ if (!empty($this->config['sso_config']) && !empty($this->config['sso_config']['h
     // Verification si le fichier de conf est bien renseigné dans toutes les lignes du tableau
     $allGood = true;
     $error = [];
-    foreach($this->config['sso_config']['hosts'] as $id => $confEntry) {
+    foreach($this->config['sso_config']['providers'] as $id => $confEntry) {
         if (strtolower($confEntry['auth_type']) == strtolower('oauth2')) {
             if (
                 empty($confEntry['auth_options']['clientId']) ||
@@ -71,11 +71,16 @@ if (!empty($this->config['sso_config']) && !empty($this->config['sso_config']['h
                 empty($confEntry['auth_options']['urlResourceOwnerDetails'])
             ) {
                 $allGood = false;
-                $error[] = 'Provider '.$id.' :' . _t('SSO_AUTH_OPTIONS_ERROR');
+                $error[] = 'Provider No ' . ($id + 1) . ' : ' . _t('SSO_AUTH_OPTIONS_ERROR');
             }
         } else {
             $allGood = false;
-            $error[] = 'Provider '.$id.' :' . _t('SSO_AUTH_TYPE_ERROR');
+            $error[] = 'Provider No '. ($id + 1) . ' : ' . _t('SSO_AUTH_TYPE_ERROR');
+        }
+
+        if (!isset($confEntry['user_fields']) || !isset($confEntry['user_fields']['email']) || !isset($confEntry['user_fields']['user_title_format'])) {
+            $allGood = false;
+            $error[] = 'Provider No '. ($id + 1) . ' : ' . _t('SSO_USERFIELDS_REQUIRED');
         }
     }
     if (!$allGood) {
@@ -88,7 +93,7 @@ if (!empty($this->config['sso_config']) && !empty($this->config['sso_config']['h
     // demande de connexion
     if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'connectOAUTH' && isset($_GET['provider'])) {
 
-        // remove the get parameters added by the auth server (the followed redirectUri must be the same
+        // remove the get parameters added by the auth server (the followed redirectUri must be the same)
         $incomingurl = preg_replace(array('(&session_state=[^&]*)', '(&state=[^&]*)', '(&code=[^&]*)'), '', $incomingurl);
 
         // utilisation du provider générique Oauth2
@@ -136,32 +141,70 @@ if (!empty($this->config['sso_config']) && !empty($this->config['sso_config']['h
                 $ssoUser = $provider->getResourceOwner($accessToken)->toArray();
 
                 if ($ssoUser) {
-                    $email = isset($ssoUser['email']) ? $ssoUser['email'] : '';
-                    $nomwiki = isset($ssoUser['name']) ? $ssoUser['name'] : '';
-                    $user = $this->LoadUser($nomwiki);
+                    $providerConf = $this->config['sso_config']['providers'][$_GET['provider']];
+
+                    $email = $ssoUser[$providerConf['user_fields']['email']];
+                    $user = loadUserByMail($email);
+
+                    // if an user with the given email doesn't, create it
                     if (!$user) {
+                        // the username will be an unique identifier created by genere_nom_wiki from the 'user_title_format' defined in the config file
+                        $userTitle = $providerConf['user_fields']['user_title_format'];
+                        foreach ($ssoUser as $ssoField => $ssoValue)
+                            $userTitle = str_replace("#[$ssoField]", $ssoUser[$ssoField], $userTitle);
+                        $username = genere_nom_user($userTitle);
+
                         // création de l'utilisateur s'il n'existe pas dans yeswiki
                         $this->Query(
-                            "insert into " . $this->config["table_prefix"] . "users set " .
+                            "INSERT INTO " . $this->config["table_prefix"] . "users SET " .
                             "signuptime = now(), " .
-                            "name = '" . mysqli_real_escape_string($this->dblink, $nomwiki) . "', " .
+                            "name = '" . mysqli_real_escape_string($this->dblink, $username) . "', " .
                             "email = '" . mysqli_real_escape_string($this->dblink, $email) . "', " .
-                            "password = md5('" . mysqli_real_escape_string($this->dblink, uniqid('cas_')) . "')"
+                            "password = 'sso'"
                         );
                         // log in
-                        $user = $this->LoadUser($nomwiki);
+                        $user = loadUserByMail($email);
                     }
-                    $this->SetUser($user, 1);
 
+                    $oldUserUpdated = false;
+                    // if the user exist already exists from a local account, replace its name and warn the user
+                    if ($user['password'] != 'sso'){
+                        // the username will be an unique identifier created by genere_nom_wiki from the 'user_title_format' defined in the config file
+                        $userTitle = $providerConf['user_fields']['user_title_format'];
+                        foreach ($ssoUser as $ssoField => $ssoValue)
+                            $userTitle = str_replace("#[$ssoField]", $ssoUser[$ssoField], $userTitle);
+                        $username = genere_nom_user($userTitle);
+
+                        $this->Query(
+                            "UPDATE " . $this->config["table_prefix"] . "users SET " .
+                            "name = '" . mysqli_real_escape_string($this->dblink, $username) . "', " .
+                            "password = 'sso' " .
+                            "WHERE name = '" . mysqli_real_escape_string($this->dblink, $user['name']) . "'"
+                        );
+
+                        $oldUserUpdated = true;
+                        $user = loadUserByMail($email);
+                    }
+
+                    $this->SetUser($user, true);
+
+                    $bazarMapping = $providerConf['bazar_mapping'];
                     // if bazarMapping is defined and the bazar user entry does't exist, create it
-                    $bazarMapping = $this->config['sso_config']['hosts'][$_GET['provider']]['bazar_mapping'];
                     if (!empty($bazarMapping)) {
-                        $entry = bazarEntryExists($this->config['sso_config']['bazar_user_entry_id'], $user['name']);
+                        $entry = bazarUserEntryExists($this->config['sso_config']['bazar_user_entry_id'], $user['name']);
                         if (!$entry) {
-                            $this->redirect($this->href('createentry', 'BazaR', 'provider=' . $_GET['provider'] . '&username=' . $user['name'] . '&attr=' . rawurlencode(serialize($ssoUser)), false));
+                            $this->redirect($this->href('createentry', 'BazaR', 'provider=' . $_GET['provider'] . '&username=' . $user['name'] .
+                                ($oldUserUpdated ? '&old_user_updated=yes' : '') . '&attr=' . rawurlencode(serialize($ssoUser)), false));
                         } else {
-                            // TODO penser à vérifier si les données de l'utilisateur ont changé et les mettre à jour le cas échéant
+                            // TODO voir si c'est nécessaire mais on peut ici vérifier si les données de la fiche bazar ont changées et les mettre à jour le cas échéant
                             // $GLOBALS['wiki']->SetMessage('La fiche a été mise à jour');
+                        }
+                    } else {
+                        // if no bazarMapping and an old user was updated, warn the user with a pop up message box
+                        if ($oldUserUpdated){
+                            // TODO améliorer ce message box qui ne reste pas assez longtemps
+                            // (soit en passant par une page de transition pour l'afficher, soit en laissant fermer la msg box par l'utilisateur)
+                            $this->SetMessage(_t('SSO_OLD_USER_UPDATED'));
                         }
                     }
 
@@ -171,7 +214,7 @@ if (!empty($this->config['sso_config']) && !empty($this->config['sso_config']['h
                     }
                     // if the UserEntries page doesn't exist, create it with a default version
                     if (!$this->LoadPage('UserEntries')) {
-                        $this->SavePage('UserEntries', '===='._t('SSO_USER_ENTRIES') . '====' . "\n{{userentries}}");
+                        $this->SavePage('UserEntries', '===='._t('SSO_USER_ENTRIES') . '====' . "\n\n{{userentries}}");
                     }
 
                     // remove the get parameters used for the connection
@@ -219,7 +262,7 @@ if (!empty($this->config['sso_config']) && !empty($this->config['sso_config']['h
                 "incomingurl" => $incomingurl,
                 "PageMenuUser" => $PageMenuUser,
                 "ConnectionDetails" => $ConnectionDetails,
-                "ssoHosts" => $this->config['sso_config']['hosts'],
+                "providers" => $this->config['sso_config']['providers'],
                 "btnclass" => $btnclass,
                 "nobtn" => $nobtn,
                 "error" => $error
