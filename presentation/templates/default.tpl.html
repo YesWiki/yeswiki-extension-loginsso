@@ -15,8 +15,8 @@
 		<ul class="list-inline provider-list">
 			<?php foreach ($providers as $id => $confEntry) : ?>
 			<li class="provider-item" style="padding-top: 10px;">
-				<a class="<?php echo $confEntry['style']['button_class']; ?> list-inline" href="<?php echo $incomingurl; ?>&amp;action=connectOAUTH&provider=<?php echo $id; ?>" title="<?php echo _t('SSO_CONNECT'); ?>">
-					<i class="<?php echo $confEntry['style']['button_icon']; ?>"></i> <?php echo $confEntry['style']['button_label']; ?>
+				<a class="<?php echo $confEntry['button_style']['button_class']; ?> list-inline" href="<?php echo $incomingurl; ?>&amp;action=connectOAUTH&provider=<?php echo $id; ?>" title="<?php echo _t('SSO_CONNECT'); ?>">
+					<i class="<?php echo $confEntry['button_style']['button_icon']; ?>"></i> <?php echo $confEntry['button_style']['button_label']; ?>
 				</a>
 			</li>
 			<?php endforeach; ?>

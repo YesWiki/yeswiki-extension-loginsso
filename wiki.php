@@ -22,7 +22,7 @@ if (empty($wakkaConfig['sso_config'])) {
         // the form id for the bazar entry corresponding to the connected user
         // if defined, a link propose to show him his user information (profile)
         // don't declare it, if you don't need to have bazar entries related to users
-        'bazar_user_entry_id' => '1',
+        'bazar_user_entry_id' => '1000',
         'providers' => [
             // each entry here is an array corresponding to a SSO provider
             [
@@ -35,18 +35,16 @@ if (empty($wakkaConfig['sso_config'])) {
                     'urlAccessToken'          => 'https://myserver/auth/realms/master/protocol/openid-connect/token',
                     'urlResourceOwnerDetails' => 'https://myserver/auth/realms/master/protocol/openid-connect/userinfo',
                 ],
-                // a yeswiki user is created from the sso server fields
-                // the email remains the same as for the sso server
-                // the username is constructed by generating an unique word (id) defined by 'user_title_format' below (by example, for 'Jean Dupond' it
-                // creates a 'JeanDupond' identifer, and if one already exists in the database, it sets 'JeanDupond2')
-                'user_fields' => [
-                    // mapping : 'yeswiki user fieldname' =>  'SSO server fieldname'
-                    'email' => 'email',
-                    // 'user_title_format' is a string in which you can refer to others sso fields by specify #[field_name]. Per example,
-                    // '#[given_name] #[family_name]' will set the full name of a person assuming that the two fields have been defined in the sso user information
-                    'user_title_format' => '#[given_name] #[family_name]'
-                ],
-                'style' => [
+                // sso server fieldname used for the user email, this email links an SSO user to a yeswiki user
+                'email_sso_field' => 'email',
+                // if create_user_from is defined, an yeswiki user with a name and an email is created.
+                // the username is an unique word (ID) generated from the format create_user_form by specifying #[field_name] to referring to a sso field
+                // if not defined, the authentification module accepts only sso users which have an yeswiki user corresponding to this email
+                'create_user_from' => '#[given_name] #[family_name]',
+                    // by example, '#[given_name] #[family_name]' sets the full name of a person assuming that the two fields have been defined in the sso user information
+                    // for 'Jean Dupond' it creates a 'JeanDupond' identifier, and if one already exists in the database, it sets 'JeanDupond2'
+                // style of the login button which corresponds to the provider
+                'button_style' => [
                     // name used for the login button
                     'button_label' => 'My Auth Server',
                     // class of this button
@@ -56,7 +54,7 @@ if (empty($wakkaConfig['sso_config'])) {
                     // you can also write a wiki page named 'ConnectionDetails' to inform the user before the buttons are displayed
                 ],
                 // if bazar_mapping is defined, the module will create an bazar entry for the user at his first connection
-                // in this case, bazar_user_entry_id needs also to be defined
+                // in this case, bazar_user_entry_id needs to be defined
                 'bazar_mapping' => [
                     // the fields mapping between the yeswiki entry fields and the sso fields
                     'fields' => [
@@ -91,8 +89,8 @@ if (empty($wakkaConfig['sso_config'])) {
                     'write_access_entry' => '%',
                     // message displayed before to create the user entry
                     'entry_creation_information' => '<p>C\'est votre première connexion avec ce compte. Une fiche avec vos informations personnelles va être créée dans le but de faciliter la mise en
-                        lien entre les utilisateurs. Les données suivantes - Prénom, Nom, E-mail, Adresse postale - vont êtres récupérées directement depuis le serveur d\'authentification et pourront 
-                        être modifiées / supprimées plus tard à votre convenance dans "Mes fiches".</p>',
+                        lien entre les utilisateurs. Les données suivantes - Prénom, Nom, E-mail - vont êtres récupérées directement depuis le serveur d\'authentification et pourront être modifiées 
+                        ou supprimées plus tard à votre convenance dans "Mes fiches".</p>',
                     // if anonymize is defined, a question is asked before to know if the user wants to be anonymous
                     'anonymize' => [
                         // consent question asked before the creation of the user entry (html tag are allowed), if the user responds 'no' his data will be transformed as below
