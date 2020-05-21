@@ -2,8 +2,6 @@
 /**
  * Basic config of the login-sso module
  *
- * @param
- *
  * @category YesWiki
  * @package  login-sso
  * @author   Adrien Cheype <adrien.cheype@gmail.com>
@@ -59,7 +57,8 @@ if (empty($wakkaConfig['sso_config'])) {
                     // the fields mapping between the yeswiki entry fields and the sso fields
                     'fields' => [
                         // mapping : 'yeswiki entry fieldname' =>  'SSO server fieldname'
-                        // you can't define 'bf_title' because it will automatically take the value of the 'user_title' defined above in the 'user_fields'
+                        // you can't define 'bf_title' because it will automatically value determined by the above 'create_user_from' but contrary to the username,
+                        // the it's not an identifier create from this value
                         'bf_nom' => 'family_name',
                         'bf_prenom' => 'given_name',
                         'bf_email' => 'email'

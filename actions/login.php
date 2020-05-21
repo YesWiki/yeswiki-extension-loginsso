@@ -148,6 +148,7 @@ if (!empty($this->config['sso_config']) && !empty($this->config['sso_config']['p
 
                     // if the user creation is forbidden and the user doesn't exists in yeswiki, alert the user he's not allowed
                     if (!isset($providerConf['create_user_from']) && !$user) {
+                        // TODO améliorer ce message box qui ne reste pas assez longtemps
                         $this->SetMessage(_t('SSO_USER_NOT_ALLOWED'));
                         // remove the get parameters used for the connection
                         $incomingurl = str_replace(array('wiki=', '&action=connectOAUTH'), '', $incomingurl);
