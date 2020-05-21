@@ -56,7 +56,7 @@ if ($this->GetUser() && $ssoUser && isset($_GET['provider']) && isset($_GET['use
                 // if the user have already click on a button
                 $anonymous = $_GET['choice']=='yes' ? false : true;
                 $fiche = createUserBazarEntry($bazarMapping, $this->config['sso_config']['bazar_user_entry_id'],
-                    $this->config['sso_config']['providers'][$_GET['provider']]['user_fields']['user_title_format'], $ssoUser, $anonymous);
+                    $this->config['sso_config']['providers'][$_GET['provider']]['create_user_from'], $ssoUser, $anonymous);
                 if (!empty($fiche)) {
                     include_once 'tools/bazar/libs/bazar.fonct.php';
 

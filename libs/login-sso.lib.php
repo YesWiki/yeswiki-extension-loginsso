@@ -82,8 +82,7 @@ function bazarUserEntryExists($entryTypeId, $username)
  *
  * @return array bazar entry formatted values
  */
-function createUserBazarEntry($bazarMapping, $bazarEntryId, $user_title_format, $ssoUser, $anonymous = false)
-{
+function createUserBazarEntry($bazarMapping, $bazarEntryId, $user_title_format, $ssoUser, $anonymous = false){
     $fiche = array();
     $fiche['id_typeannonce'] = $bazarEntryId;
 
