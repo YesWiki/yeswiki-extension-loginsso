@@ -27,11 +27,11 @@ if (empty($wakkaConfig['sso_config'])) {
                 // the authentification auth type, two protocols/services are supported : 'oauth2' and 'cas'
                 'auth_type'    => 'oauth2',
                 'auth_options' => [
-                    'clientId'                => 'myclientid',    // The client ID assigned to you by the provider
-                    'clientSecret'            => 'mysecretclientkey',   // The client secret assigned to you by the provider
-                    'urlAuthorize'            => 'https://myserver/auth/realms/master/protocol/openid-connect/auth',
-                    'urlAccessToken'          => 'https://myserver/auth/realms/master/protocol/openid-connect/token',
-                    'urlResourceOwnerDetails' => 'https://myserver/auth/realms/master/protocol/openid-connect/userinfo',
+                    'clientId'                => 'yeswiki-test',    // The client ID assigned to you by the provider
+                    'clientSecret'            => 'd458cd44-ff72-4bbc-8649-4d7a3d54d71d',   // The client secret assigned to you by the provider
+                    'urlAuthorize'            => 'https://login.lescommuns.org/auth/realms/master/protocol/openid-connect/auth',
+                    'urlAccessToken'          => 'https://login.lescommuns.org/auth/realms/master/protocol/openid-connect/token',
+                    'urlResourceOwnerDetails' => 'https://login.lescommuns.org/auth/realms/master/protocol/openid-connect/userinfo',
                 ],
                 // sso server fieldname used for the user email, this email links an SSO user to a yeswiki user
                 'email_sso_field' => 'email',
@@ -44,9 +44,9 @@ if (empty($wakkaConfig['sso_config'])) {
                 // style of the login button which corresponds to the provider
                 'button_style' => [
                     // name used for the login button
-                    'button_label' => 'My Auth Server',
+                    'button_label' => 'Les communs',
                     // class of this button
-                    'button_class' => 'btn btn-default btn-myauth',
+                    'button_class' => 'btn btn-default btn-lescommuns',
                     // icon used for this button (class of the <i>)
                     'button_icon' => 'glyphicon glyphicon-log-in'
                     // you can also write a wiki page named 'ConnectionDetails' to inform the user before the buttons are displayed
