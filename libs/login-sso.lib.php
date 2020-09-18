@@ -156,7 +156,7 @@ function genere_nom_user($nom)
  * @param int $number le nombre donné à l'itération courante
  * @return string chaine de caracteres le nom unique trouvé
  */
-function addNumberToUniqueNameIfNotCondition ($name, $condition, $number = 1) {
+function addNumberToUniqueNameIfNotCondition($name, $condition, $number = 1) {
     if ($number == 1) {
         $newUsername = $name;
     }
