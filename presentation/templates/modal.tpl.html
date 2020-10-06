@@ -7,7 +7,7 @@
      <div class="modal-content">
     <div class="modal-body">
       <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-      <h4 style="margin-bottom: 20px;" id="LoginModalLabel"><?php echo _t('LOGIN_CONNECTED_AS').' '.$user; ?></h4>
+      <h4 style="margin-bottom: 20px;" id="LoginModalLabel"><?php echo _t('LOGIN_CONNECTED_AS') . ' ' . $user; ?></h4>
       <?php echo $PageMenuUser; ?>
       <div style="text-align: center">
         <a href="<?php echo $incomingurl; ?>&amp;action=logout" class="btn btn-primary btn_logout" style="margin-top: 20px;" title="<?php echo _t('LOGIN_LOGOUT'); ?>"><?php echo _t('LOGIN_LOGOUT'); ?></a>
@@ -31,10 +31,10 @@
           </div>
           <div class="provider-container" style="display: flex; justify-content: center; margin-top: 20px">
             <ul class="list-inline provider-list">
-            <?php foreach ($ssoHosts as $id => $confEntry) : ?>
+            <?php foreach ($providers as $id => $confEntry) : ?>
               <li class="provider-item" style="padding-top: 10px;">
-                <a class="<?php echo $confEntry['style']['button_class']; ?> list-inline" href="<?php echo $incomingurl; ?>&amp;action=connectOAUTH&provider=<?php echo $id; ?>" title="<?php echo _t('SSO_CONNECT'); ?>">
-                  <i class="<?php echo $confEntry['style']['button_icon']; ?>"></i> <?php echo $confEntry['style']['button_label']; ?>
+                <a class="<?php echo $confEntry['button_style']['button_class']; ?> list-inline" href="<?php echo $incomingurl; ?>&amp;action=connectOAUTH&provider=<?php echo $id; ?>" title="<?php echo _t('SSO_CONNECT'); ?>">
+                  <i class="<?php echo $confEntry['button_style']['button_icon']; ?>"></i> <?php echo $confEntry['button_style']['button_label']; ?>
                 </a>
               </li>
             <?php endforeach; ?>

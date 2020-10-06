@@ -24,12 +24,11 @@ $user = $this->GetUser();
 
 // test if the user is connected and if the 'bazar_user_entry_id' config key is declared
 if (!empty($user) && !empty($this->config['sso_config']) && isset($this->config['sso_config']['bazar_user_entry_id'])){
-    $entry = bazarEntryExists($this->config['sso_config']['bazar_user_entry_id'], $user['name']);
-    if ($entry) {
+    if (bazarUserEntryExists($this->config['sso_config']['bazar_user_entry_id'], $user['name'])) {
         $content = '';
         if ($this->GetParameter('dash') == '1')
             $content .= ' - ';
-        $content .= '[[' . $entry . ' ' . _t('SSO_SEE_USER_PROFIL') . ']]';
+        $content .= '[[' . $user['name'] . ' ' . _t('SSO_SEE_USER_PROFIL') . ']]';
         echo $this->Format($content);
     }
 }

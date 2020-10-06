@@ -1,3 +1,24 @@
+# Macintosh OS
 .DS_Store
+
+# Eclipse IDE
+.buildpath
+.project
+.settings/
+
+# PHPStorm IDE
+.idea
+*.iml
+
+# vscode IDE
+.vscode
+
+# Docker
+.db
+
+# Other
+.phpintel/
+
+TODO
 vendor
 composer.lock
