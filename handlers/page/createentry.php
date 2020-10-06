@@ -15,6 +15,8 @@ if (!defined("WIKINI_VERSION")) {
     die("acc&egrave;s direct interdit");
 }
 
+global $bazarFiche;
+
 require_once 'tools/login-sso/libs/login-sso.lib.php';
 ob_start();
 
@@ -62,9 +64,7 @@ if ($this->GetUser() && $ssoUser && isset($_GET['provider']) && isset($_GET['use
 
                     if (!$anonymous) {
                         $fiche['id_fiche'] = $_GET['username'];
-                        $fiche = baz_insertion_fiche($fiche);
-                    }
-                    else {
+                    } else {
                         $entryId = genere_nom_user($fiche['bf_titre']);
                         // in case of an anonymized user, update the username with the entry id and save the entry with this user
                         $this->Query(
@@ -78,10 +78,11 @@ if ($this->GetUser() && $ssoUser && isset($_GET['provider']) && isset($_GET['use
                         $user = $this->LoadUser($entryId);
                         $this->SetUser($user, true);
 
-                        // save the entry with the new username
                         $fiche['id_fiche'] = $entryId;
-                        $fiche = baz_insertion_fiche($fiche);
                     }
+
+                    $fiche['antispam'] = 1;
+                    $fiche = $bazarFiche->create($this->config['sso_config']['bazar_user_entry_id'], $fiche);
 
                     // set the read access of the entry ('+' by default)
                     $readAccess = isset($bazarMapping['read_access_entry']) ? $bazarMapping['read_access_entry'] : '+';

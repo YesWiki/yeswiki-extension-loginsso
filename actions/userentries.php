@@ -38,7 +38,7 @@ if (!empty($user)) {
             $GLOBALS['_BAZAR_']['templates'] = $GLOBALS['wiki']->config['default_bazar_template'];
         }
 
-        $tableau_dernieres_fiches = baz_requete_recherche_fiches('', '', '', '', 1, addslashes($username));
+        $tableau_dernieres_fiches = $GLOBALS['bazarFiche']->search(['user' => addslashes($username)]);
         // remove the user entry from the results if a bazar_user_entry_id is defined in the config
         if (!empty($this->config['sso_config']['bazar_user_entry_id'])) {
             foreach ($tableau_dernieres_fiches as $index => $fiche) {
