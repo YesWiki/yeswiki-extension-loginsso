@@ -63,10 +63,8 @@ function checkBazarMappingConfig($config, $provider)
  */
 function bazarUserEntryExists($entryTypeId, $username)
 {
-    include_once 'tools/bazar/libs/bazar.fonct.php';
-
     // first search the entries of $entryTypeId type which have the $username as owner
-    $res = baz_requete_recherche_fiches('', '', $entryTypeId, '', 1, $username);
+    $res = $GLOBALS['bazarFiche']->search(['formsIds' => [$entryTypeId], 'user' => $username]);
     // then check if there is an entry which have $username as tag
     return !empty(array_filter($res, function ($element) use ($username) {return ($element['tag'] == $username);}));
 }
