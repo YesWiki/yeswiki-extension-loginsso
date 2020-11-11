@@ -9,11 +9,11 @@ parameters:
       - # the authentification auth type, two protocols/services are supported: 'oauth2' and 'cas'
         auth_type: 'oauth2'
         auth_options:
-          - clientId: 'myclientid'  # The client ID assigned to you by the provider
-          - clientSecret: 'mysecretclientkey' # The client secret assigned to you by the provider
-          - urlAuthorize: 'https:#myserver/auth/realms/master/protocol/openid-connect/auth'
-          - urlAccessToken: 'https:#myserver/auth/realms/master/protocol/openid-connect/token'
-          - urlResourceOwnerDetails: 'https:#myserver/auth/realms/master/protocol/openid-connect/userinfo'
+          clientId: 'myclientid'  # The client ID assigned to you by the provider
+          clientSecret: 'mysecretclientkey' # The client secret assigned to you by the provider
+          urlAuthorize: 'https:#myserver/auth/realms/master/protocol/openid-connect/auth'
+          urlAccessToken: 'https:#myserver/auth/realms/master/protocol/openid-connect/token'
+          urlResourceOwnerDetails: 'https:#myserver/auth/realms/master/protocol/openid-connect/userinfo'
         # sso server fieldname used for the user email, this email links an SSO user to a yeswiki user
         email_sso_field: 'email'
         # if create_user_from is defined, an yeswiki user with a name and an email is created.
@@ -24,15 +24,15 @@ parameters:
         create_user_from: '#[given_name] #[family_name]'
         # style of the login button which corresponds to the provider
         button_style:
-           # name used for the login button
-           button_label: 'My Auth Server'
-           # class of this button
-           button_class: 'btn btn-default btn-myauth'
-           # icon used for this button (class of the <i>)
-           button_icon: 'glyphicon glyphicon-log-in'
-           # you can also write a wiki page named 'ConnectionDetails' to inform the user before the buttons are displayed
-        # if bazar_mapping is defined, the module will create an bazar entry for the user at his first connection
-        # in this case, bazar_user_entry_id needs to be defined
+          # name used for the login button
+          button_label: 'My Auth Server'
+          # class of this button
+          button_class: 'btn btn-default btn-myauth'
+          # icon used for this button (class of the <i>)
+          button_icon: 'glyphicon glyphicon-log-in'
+          # you can also write a wiki page named 'ConnectionDetails' to inform the user before the buttons are displayed
+          # if bazar_mapping is defined, the module will create an bazar entry for the user at his first connection
+          # in this case, bazar_user_entry_id needs to be defined
         bazar_mapping:
           # the fields mapping between the yeswiki entry fields and the sso fields
           fields:
@@ -46,20 +46,19 @@ parameters:
           # no transformation will be made if the user has chosen to anonymize its data
           # each element must have the 'yeswiki_entry_field', 'sso_field', 'pattern' and 'replacement' keys
           fields_transformed:
-            - 
-              # this example transforms an address like 'myadress@myserver.com' to this address: 'myadress|myserver.com'
-              # the yeswiki entry fieldname which be the result of the transformation, it MUST BE already defined as a key in bazar_mapping
-              yeswiki_entry_field: 'bf_email'
-              # the sso fieldname used for the transformation, it has to be defined in the sso user information but doesn't need to be declared
-              # as a value in 'bazar_mappings.fields'
-              sso_field: 'email'
-              # regular expression pattern which match with the value of the sso_field, it has to extract some groups used in replacement
-              # see https:#www.php.net/manual/en/function.preg-replace.php for more details about the syntax
-              pattern: '/([ a-z\-_\. ]+)@([ a-z\-_\. ]+)/i'
-              # '/\s*(\d+\.\d*)\s*,\s*(\d+\.\d*)\s/'
-              # the pattern which defines the final value set for the yeswiki entry field by referring the pattern groups
-              # see https:#www.php.net/manual/en/function.preg-replace.php for more details about the syntax
-              replacement: '$1|$2'
+            # this example transforms an address like 'myadress@myserver.com' to this address: 'myadress|myserver.com'
+            # the yeswiki entry fieldname which be the result of the transformation, it MUST BE already defined as a key in bazar_mapping
+            yeswiki_entry_field: 'bf_email'
+            # the sso fieldname used for the transformation, it has to be defined in the sso user information but doesn't need to be declared
+            # as a value in 'bazar_mappings.fields'
+            sso_field: 'email'
+            # regular expression pattern which match with the value of the sso_field, it has to extract some groups used in replacement
+            # see https:#www.php.net/manual/en/function.preg-replace.php for more details about the syntax
+            pattern: '/([ a-z\-_\. ]+)@([ a-z\-_\. ]+)/i'
+            # '/\s*(\d+\.\d*)\s*,\s*(\d+\.\d*)\s/'
+            # the pattern which defines the final value set for the yeswiki entry field by referring the pattern groups
+            # see https:#www.php.net/manual/en/function.preg-replace.php for more details about the syntax
+            replacement: '$1|$2'
           # access defined to view the user entry ('+' by default)
           read_access_entry: '+'
           # access defined to modify the user entry ('%' by default)

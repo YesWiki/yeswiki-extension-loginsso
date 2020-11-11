@@ -9,6 +9,8 @@
  * @license  https://www.gnu.org/licenses/agpl-3.0.en.html AGPL 3.0
  * @link     https://yeswiki.net
  */
+namespace YesWiki;
+use SquelettePhp;
 
 if (!defined('WIKINI_VERSION')) {
     die('acc&egrave;s direct interdit');

@@ -44,7 +44,7 @@ if (!empty($user)) {
         // remove the user entry from the results if a bazar_user_entry_id is defined in the config
         if (!empty($this->config['sso_config']['bazar_user_entry_id'])) {
             foreach ($tableau_dernieres_fiches as $index => $fiche) {
-                if (preg_match('/.*"id_typeannonce":"' . $this->config['sso_config']['bazar_user_entry_id'] . '".*/', $fiche['body']))
+                if (intval($fiche["id_typeannonce"]) == $this->config['sso_config']['bazar_user_entry_id'])
                     unset($tableau_dernieres_fiches[$index]);
             }
         }
