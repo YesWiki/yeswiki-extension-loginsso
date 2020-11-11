@@ -10,6 +10,8 @@
  * @license  https://www.gnu.org/licenses/agpl-3.0.en.html AGPL 3.0
  * @link     https://yeswiki.net
  */
+namespace YesWiki;
+use YesWiki\Bazar\Service\FicheManager;
 
 if (!defined("WIKINI_VERSION")) {
     die("acc&egrave;s direct interdit");
@@ -38,7 +40,7 @@ if (!empty($user)) {
             $GLOBALS['_BAZAR_']['templates'] = $GLOBALS['wiki']->config['default_bazar_template'];
         }
 
-        $tableau_dernieres_fiches = $GLOBALS['bazarFiche']->search(['user' => addslashes($username)]);
+        $tableau_dernieres_fiches = $GLOBALS['wiki']->services->get(FicheManager::class)->search(['user' => addslashes($username)]);
         // remove the user entry from the results if a bazar_user_entry_id is defined in the config
         if (!empty($this->config['sso_config']['bazar_user_entry_id'])) {
             foreach ($tableau_dernieres_fiches as $index => $fiche) {

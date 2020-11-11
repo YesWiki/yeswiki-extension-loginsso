@@ -1,4 +1,7 @@
 <?php
+namespace YesWiki;
+use YesWiki\Bazar\Service\FicheManager;
+
 /**
  * Handler for creating bazar entry based on SOS server informations
  * 
@@ -15,7 +18,7 @@ if (!defined("WIKINI_VERSION")) {
     die("acc&egrave;s direct interdit");
 }
 
-global $bazarFiche;
+$ficheManager = $this->services->get(FicheManager::class);
 
 require_once 'tools/login-sso/libs/login-sso.lib.php';
 ob_start();
@@ -82,7 +85,7 @@ if ($this->GetUser() && $ssoUser && isset($_GET['provider']) && isset($_GET['use
                     }
 
                     $fiche['antispam'] = 1;
-                    $fiche = $bazarFiche->create($this->config['sso_config']['bazar_user_entry_id'], $fiche);
+                    $fiche = $ficheManager->create($this->config['sso_config']['bazar_user_entry_id'], $fiche);
 
                     // set the read access of the entry ('+' by default)
                     $readAccess = isset($bazarMapping['read_access_entry']) ? $bazarMapping['read_access_entry'] : '+';
