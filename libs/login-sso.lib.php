@@ -1,4 +1,7 @@
 <?php
+namespace YesWiki;
+use YesWiki\Bazar\Service\FicheManager;
+
 /**
  * Library of SSO login users functions
  *
@@ -64,7 +67,7 @@ function checkBazarMappingConfig($config, $provider)
 function bazarUserEntryExists($entryTypeId, $username)
 {
     // first search the entries of $entryTypeId type which have the $username as owner
-    $res = $GLOBALS['wiki']->services->get('bazar.fiche.manager')->search(['formsIds' => [$entryTypeId], 'user' => $username]);
+    $res = $GLOBALS['wiki']->services->get(FicheManager::class)->search(['formsIds' => [$entryTypeId], 'user' => $username]);
     // then check if there is an entry which have $username as tag
     return !empty(array_filter($res, function ($element) use ($username) {return ($element['tag'] == $username);}));
 }

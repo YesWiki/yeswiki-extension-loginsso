@@ -1,4 +1,7 @@
 <?php
+namespace YesWiki;
+use YesWiki\Bazar\Service\FicheManager;
+
 /**
  * Handler for creating bazar entry based on SOS server informations
  * 
@@ -15,7 +18,7 @@ if (!defined("WIKINI_VERSION")) {
     die("acc&egrave;s direct interdit");
 }
 
-$ficheManager = $this->services->get('bazar.fiche.manager');
+$ficheManager = $this->services->get(FicheManager::class);
 
 require_once 'tools/login-sso/libs/login-sso.lib.php';
 ob_start();
