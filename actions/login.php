@@ -51,6 +51,8 @@ if (!empty($this->config['sso_config']) && !empty($this->config['sso_config']['p
     $incomingurl = $this->GetParameter('incomingurl');
     if (empty($incomingurl)) {
         $incomingurl = 'http'.((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? 's' : '') . '://' . "{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
+    } else {
+        $incomingurl = urldecode($incomingurl);
     }
 
     // cas de la déconnexion
@@ -208,7 +210,7 @@ if (!empty($this->config['sso_config']) && !empty($this->config['sso_config']['p
                             $entry = bazarUserEntryExists($this->config['sso_config']['bazar_user_entry_id'], $user['name']);
                             if (!$entry) {
                                 $this->redirect($this->href('createentry', 'BazaR', 'provider=' . $_GET['provider'] . '&username=' . $user['name'] .
-                                    ($oldUserUpdated ? '&old_user_updated=yes' : '') . '&attr=' . rawurlencode(serialize($ssoUser)), false));
+                                    ($oldUserUpdated ? '&old_user_updated=yes' : '') . '&attr=' . urlencode(serialize($ssoUser)), false));
                             } else {
                                 // TODO voir si c'est nécessaire mais on peut ici vérifier si les données de la fiche bazar ont changées et les mettre à jour le cas échéant
                                 // $GLOBALS['wiki']->SetMessage('La fiche a été mise à jour');
