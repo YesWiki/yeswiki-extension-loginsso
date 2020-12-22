@@ -148,6 +148,7 @@ if (!empty($this->config['sso_config']) && !empty($this->config['sso_config']['p
                     $providerConf = $this->config['sso_config']['providers'][$_GET['provider']];
 
                     $email = $ssoUser[$providerConf['email_sso_field']];
+                    // TODO add config parameter to choose if the user is load with its email or its id (in this case, loadUser($id) is called)
                     $user = loadUserByMail($email);
 
                     // if the user creation is forbidden and the user doesn't exists in yeswiki, alert the user he's not allowed
