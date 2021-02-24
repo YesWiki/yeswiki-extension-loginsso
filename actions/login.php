@@ -176,7 +176,8 @@ if (!empty($this->config['sso_config']) && !empty($this->config['sso_config']['p
                                 "signuptime = now(), " .
                                 "name = '" . mysqli_real_escape_string($this->dblink, $username) . "', " .
                                 "email = '" . mysqli_real_escape_string($this->dblink, $email) . "', " .
-                                "password = 'sso'"
+                                "password = 'sso'" . ", " .
+                                "motto = ''"
                             );
                             // log in
                             $user = loadUserByMail($email);

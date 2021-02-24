@@ -45,12 +45,12 @@ function checkBazarMappingConfig($config, $provider)
                 ) &&
                 ( empty($bazar['fields_transformed']) ||
                     !empty($bazar['fields_transformed']) &&
-                        array_filter($bazar['fields_transformed'], function($ft) {
+                        count(array_filter($bazar['fields_transformed'], function($ft) {
                             return isset($ft['yeswiki_entry_field']) &&
                                 isset($ft['sso_field']) &&
                                 isset($ft['pattern']) &&
                                 isset($ft['replacement']);
-                        })
+                        })) == count($bazar['fields_transformed'])
                 )
         );
     } else return false;
