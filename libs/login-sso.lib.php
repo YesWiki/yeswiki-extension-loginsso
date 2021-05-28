@@ -139,85 +139,12 @@ function createUserBazarEntry($bazarMapping, $bazarEntryId, $user_title_format, 
  *
  *   return  string chaine de caracteres, en NomWiki unique
  */
-function genere_nom_user($nom)
+function genere_nom_user($name): string
 {
-    $uniformizedName = createWikiNameFromDisplayName($nom);
+    include_once 'tools/bazar/libs/bazar.fonct.php';
 
-    // the condition to stop iteration is to have a available username and an available page of the same name
-    return addNumberToUniqueNameIfNotCondition($uniformizedName, function($name){
+    // the condition for the unicity is to have a available username and an available page of the same name
+    return genereTagNameFromCondition($name, function($name){
         return !$GLOBALS['wiki']->LoadPage($name) && !$GLOBALS['wiki']->LoadUser($name);
     });
 }
-
-/**
- * Trouve un nom unique en incrémentant un numéro tant que $condition est faux. Le numéro est trouvé dès que la $condition est vrai.
- * Rend finalement le $name avec à la suite ce numéro ($number). Si $number = 1 (valeur de départ), seul le $name est rendu.
- *
- * @param $name le nom donné au départ
- * @param int $number le nombre donné à l'itération courante
- * @return string chaine de caracteres le nom unique trouvé
- */
-function addNumberToUniqueNameIfNotCondition ($name, $condition, $number = 1) {
-    if ($number == 1) {
-        $newUsername = $name;
-    }
-    else {
-        $newUsername = $name . $number;
-    }
-
-    if ($condition($newUsername))
-        return $newUsername;
-
-    // If name is all ready taken
-    return addNumberToUniqueNameIfNotCondition($name, $condition, $number + 1);
-}
-
-/**
- *  Source : https://github.com/YesWiki/yeswiki/blob/e5586377defe4568427bdff4d99c9c0023ba49b0/tools/bazar/libs/bazar.fonct.php#L3033 -> function genere_nom_wiki($nom, $occurence = 1)
- *  $occurence has been removed
- *
- *  Prends une chaine de caracteres et la tranforme en NomWiki unique, en la limitant
- *  a 50 caracteres et en mettant 2 majuscules
- *
- *   return  string chaine de caracteres
- */
-function createWikiNameFromDisplayName($displayName, $charset = 'UTF-8'){
-    include_once 'tools/bazar/libs/bazar.fonct.php';
-
-    $nom = $displayName; // added by FunkycraM
-
-    // les noms wiki ne doivent pas depasser les 50 caracteres, on coupe a 48
-    // histoire de pouvoir ajouter un chiffre derriere si nom wiki deja existant
-    // plus traitement des accents et ponctuation
-    // plus on met des majuscules au debut de chaque mot et on fait sauter les espaces
-    $temp = removeAccents(mb_substr(preg_replace('/[[:punct:]]/', ' ', $nom), 0, 47, $charset)); // $charset replaced by FunkycraM
-    $temp = explode(' ', ucwords(strtolower($temp)));
-    $nom = '';
-    foreach ($temp as $mot) {
-        // on vire d'eventuels autres caracteres speciaux
-        $nom .= preg_replace('/[^a-zA-Z0-9]/', '', trim($mot));
-    }
-
-    // on verifie qu'il y a au moins 2 majuscules, sinon on en rajoute une a la fin
-    $var = preg_replace('/[^A-Z]/', '', $nom);
-    if (strlen($var) < 2) {
-        $last = ucfirst(substr($nom, strlen($nom) - 1));
-        $nom = substr($nom, 0, -1).$last;
-    }
-
-    $nom = '';
-    foreach ($temp as $mot) {
-        // on vire d'eventuels autres caracteres speciaux
-        $nom .= preg_replace('/[^a-zA-Z0-9]/', '', trim($mot));
-    }
-
-    // on verifie qu'il y a au moins 2 majuscules, sinon on en rajoute une a la fin
-    $var = preg_replace('/[^A-Z]/', '', $nom);
-    if (strlen($var) < 2) {
-        $last = ucfirst(substr($nom, strlen($nom) - 1));
-        $nom = substr($nom, 0, -1).$last;
-    }
-
-    return $nom;
-}
-
