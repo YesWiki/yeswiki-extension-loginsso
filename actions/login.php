@@ -294,5 +294,5 @@ if (!empty($this->config['sso_config']) && !empty($this->config['sso_config']['p
     echo (!empty($class)) ? '<div class="'.$class.'">'."\n".$content."\n".'</div>'."\n" : $content;
 
 } else {
-    echo '<div class="alert alert-danger">' . _t('$SSO_CONFIG_ERROR') . '</div>'."\n";
+    echo '<div class="alert alert-danger">' . _t('SSO_CONFIG_ERROR') . '</div>'."\n";
 }
