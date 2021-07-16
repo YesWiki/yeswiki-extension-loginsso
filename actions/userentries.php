@@ -50,15 +50,7 @@ if (!empty($user)) {
             }
         }
         if (count($entries) > 0) {
-            $data = [];
-            $data['fiches'] = $entries;
-            $data['info_res'] = '<div class="alert alert-info">' . _t('BAZ_IL_Y_A') . ' '.count($data['fiches'])
-                . ' ' . (count($data['fiches']) <= 1 ? _t('BAZ_FICHE') : _t('BAZ_FICHES')) . '</div>';
-            $twig = $GLOBALS['wiki']->services->get(TemplateEngine::class);
-            echo '<div id="bazar-list-1" class="bazar-list" data-template="liste_accordeon.tpl.html">
-                    <div class="list">';
-            echo $twig->render("@bazar/liste_accordeon.tpl.html", $data);
-            echo '</div></div>';
+            echo displayResultList($entries);
         } else {
             echo '<div class="alert alert-info">' . _t('SSO_NO_USER_ENTRIES') . '</div>' . "\n";
         }
