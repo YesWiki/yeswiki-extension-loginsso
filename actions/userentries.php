@@ -12,6 +12,7 @@
  */
 namespace YesWiki;
 use YesWiki\Bazar\Service\EntryManager;
+use YesWiki\Core\Service\TemplateEngine;
 
 if (!defined("WIKINI_VERSION")) {
     die("acc&egrave;s direct interdit");
@@ -40,17 +41,24 @@ if (!empty($user)) {
             $GLOBALS['_BAZAR_']['templates'] = $GLOBALS['wiki']->config['default_bazar_template'];
         }
 
-        $tableau_dernieres_fiches = $GLOBALS['wiki']->services->get(EntryManager::class)->search(['user' => addslashes($username)]);
+        $entries = $GLOBALS['wiki']->services->get(EntryManager::class)->search(['user' => addslashes($username)]);
         // remove the user entry from the results if a bazar_user_entry_id is defined in the config
         if (!empty($this->config['sso_config']['bazar_user_entry_id'])) {
-            foreach ($tableau_dernieres_fiches as $index => $fiche) {
+            foreach ($entries as $index => $fiche) {
                 if (intval($fiche["id_typeannonce"]) == $this->config['sso_config']['bazar_user_entry_id'])
-                    unset($tableau_dernieres_fiches[$index]);
+                    unset($entries[$index]);
             }
         }
-        if (count($tableau_dernieres_fiches) > 0) {
-            $params = getAllParameters($this);
-            echo displayResultList($tableau_dernieres_fiches, $params, true);
+        if (count($entries) > 0) {
+            $data = [];
+            $data['fiches'] = $entries;
+            $data['info_res'] = '<div class="alert alert-info">' . _t('BAZ_IL_Y_A') . ' '.count($data['fiches'])
+                . ' ' . (count($data['fiches']) <= 1 ? _t('BAZ_FICHE') : _t('BAZ_FICHES')) . '</div>';
+            $twig = $GLOBALS['wiki']->services->get(TemplateEngine::class);
+            echo '<div id="bazar-list-1" class="bazar-list" data-template="liste_accordeon.tpl.html">
+                    <div class="list">';
+            echo $twig->render("@bazar/liste_accordeon.tpl.html", $data);
+            echo '</div></div>';
         } else {
             echo '<div class="alert alert-info">' . _t('SSO_NO_USER_ENTRIES') . '</div>' . "\n";
         }
