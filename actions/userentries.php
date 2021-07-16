@@ -11,6 +11,7 @@
  * @link     https://yeswiki.net
  */
 namespace YesWiki;
+use YesWiki\Bazar\Controller\EntryController;
 use YesWiki\Bazar\Service\EntryManager;
 use YesWiki\Core\Service\TemplateEngine;
 
@@ -50,7 +51,8 @@ if (!empty($user)) {
             }
         }
         if (count($entries) > 0) {
-            echo displayResultList($entries);
+            $entryController = $GLOBALS['wiki']->services->get(EntryController::class);
+            echo $entryController->renderBazarList($entries);
         } else {
             echo '<div class="alert alert-info">' . _t('SSO_NO_USER_ENTRIES') . '</div>' . "\n";
         }
