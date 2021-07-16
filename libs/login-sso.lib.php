@@ -102,7 +102,7 @@ function createUserBazarEntry($bazarMapping, $bazarEntryId, $user_title_format, 
         foreach ($bazarMapping['fields'] as $yeswikiField => $ssoField) {
             if (!isset($ssoUser[$ssoField])) {
                 $fiche[$yeswikiField] = '';
-            } else {
+            } else if (!empty($fieldTransformed['field'])){
                 $transformDone = false;
                 foreach ($bazarMapping['fields_transformed'] as $fieldTransformed) {
                     if ($fieldTransformed['field'] == $yeswikiField) {
