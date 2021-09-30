@@ -104,11 +104,14 @@ function createUserBazarEntry($bazarMapping, $bazarEntryId, $user_title_format, 
                 $fiche[$yeswikiField] = '';
             } else if (!empty($fieldTransformed['field'])){
                 $transformDone = false;
-                foreach ($bazarMapping['fields_transformed'] as $fieldTransformed) {
-                    if ($fieldTransformed['field'] == $yeswikiField) {
-                        // transform the sso field according to the pattern and replacement formats defined in the config file
-                        $fiche[$yeswikiField] = preg_replace($fieldTransformed['pattern'], $fieldTransformed['replacement'], $ssoUser[$fieldTransformed['sso_field']]);
-                        $transformDone = true;
+                if (isset($bazarMapping['fields_transformed'])){
+                    foreach ($bazarMapping['fields_transformed'] as $fieldTransformed) {
+                        if ($fieldTransformed['field'] == $yeswikiField) {
+                            // transform the sso field according to the pattern and replacement formats defined in the config file
+                            $fiche[$yeswikiField] = preg_replace($fieldTransformed['pattern'],
+                                $fieldTransformed['replacement'], $ssoUser[$fieldTransformed['sso_field']]);
+                            $transformDone = true;
+                        }
                     }
                 }
                 if (!$transformDone){
