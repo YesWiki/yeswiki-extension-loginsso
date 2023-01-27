@@ -2,7 +2,7 @@
 
 Use SSO server authentification in YesWiki
 
-See the example of configuration given in _wiki.php_
+See the example of configuration given in the _config.yaml_
 
 Once copied in the *tools* folder, finish the install by typing `composer install`. 
 
