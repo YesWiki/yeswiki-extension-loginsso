@@ -11,6 +11,7 @@
  */
 namespace YesWiki;
 use SquelettePhp;
+use YesWiki\Core\Controller\AuthController;
 
 if (!defined('WIKINI_VERSION')) {
     die('acc&egrave;s direct interdit');
@@ -113,9 +114,14 @@ if (!empty($this->config['sso_config']) && !empty($this->config['sso_config']['p
         // if we don't have an authorization code then get one
         if (!isset($_GET['code'])) {
 
+            // specific options for Keycloak (from the 20.0.0 version)
+            $options = [
+                'scope' => ['openid', 'email', 'profile']
+            ];
+
             // fetch the authorization URL from the provider; this returns the urlAuthorize option and generates and applies any necessary parameters
             // (e.g. state)
-            $authorizationUrl = $provider->getAuthorizationUrl();
+            $authorizationUrl = $provider->getAuthorizationUrl($options);
 
             // get the state generated for you and store it to the session
             $_SESSION['oauth2state'] = $provider->getState();
@@ -204,7 +210,7 @@ if (!empty($this->config['sso_config']) && !empty($this->config['sso_config']['p
                             $user = loadUserByMail($email);
                         }
 
-                        $this->SetUser($user, true);
+                        $this->services->get(AuthController::class)->login($user, true);
 
                         $bazarMapping = $providerConf['bazar_mapping'];
                         // if bazarMapping is defined and the bazar user entry does't exist, create it
