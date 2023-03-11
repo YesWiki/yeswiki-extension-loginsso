@@ -12,6 +12,7 @@
 namespace YesWiki;
 use SquelettePhp;
 use YesWiki\Core\Controller\AuthController;
+use YesWiki\Core\Service\UserManager;
 
 if (!defined('WIKINI_VERSION')) {
     die('acc&egrave;s direct interdit');
@@ -116,7 +117,7 @@ if (!empty($this->config['sso_config']) && !empty($this->config['sso_config']['p
 
             // specific options for Keycloak (from the 20.0.0 version)
             $options = [
-                'scope' => ['openid', 'email', 'profile']
+                'scope' => ['openid']
             ];
 
             // fetch the authorization URL from the provider; this returns the urlAuthorize option and generates and applies any necessary parameters
@@ -154,8 +155,10 @@ if (!empty($this->config['sso_config']) && !empty($this->config['sso_config']['p
                     $providerConf = $this->config['sso_config']['providers'][$_GET['provider']];
 
                     $email = $ssoUser[$providerConf['email_sso_field']];
+
                     // TODO add config parameter to choose if the user is load with its email or its id (in this case, loadUser($id) is called)
-                    $user = loadUserByMail($email);
+
+                    $user = $this->services->get(UserManager::class)->getOneByEmail($email);
 
                     // if the user creation is forbidden and the user doesn't exists in yeswiki, alert the user he's not allowed
                     if (!isset($providerConf['create_user_from']) && !$user) {
@@ -186,7 +189,7 @@ if (!empty($this->config['sso_config']) && !empty($this->config['sso_config']['p
                                 "motto = ''"
                             );
                             // log in
-                            $user = loadUserByMail($email);
+                            $user = $this->services->get(UserManager::class)->getOneByEmail($email);
                         }
 
                         $oldUserUpdated = false;
@@ -207,7 +210,7 @@ if (!empty($this->config['sso_config']) && !empty($this->config['sso_config']['p
                             );
 
                             $oldUserUpdated = true;
-                            $user = loadUserByMail($email);
+                            $user = $this->services->get(UserManager::class)->getOneByEmail($email);
                         }
 
                         $this->services->get(AuthController::class)->login($user, true);
