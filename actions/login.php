@@ -100,7 +100,9 @@ if (!empty($this->config['sso_config']) && !empty($this->config['sso_config']['p
     if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'connectOAUTH' && isset($_GET['provider'])) {
 
         // remove the get parameters added by the auth server (the followed redirectUri must be the same)
-        $incomingurl = preg_replace(array('(&session_state=[^&]*)', '(&state=[^&]*)', '(&code=[^&]*)'), '', $incomingurl);
+        // iss param removed after being added in Keycloak 23.0.0 (cf https://github.com/keycloak/keycloak/discussions/25684)
+        $incomingurl = preg_replace(array('(&session_state=[^&]*)', '(&state=[^&]*)', '(&code=[^&]*)', '(&iss=[^&]*)'),
+            '', $incomingurl);
 
         // utilisation du provider générique Oauth2
         $provider = new \League\OAuth2\Client\Provider\GenericProvider([
@@ -252,7 +254,7 @@ if (!empty($this->config['sso_config']) && !empty($this->config['sso_config']['p
                     }
                 }
             } catch (\League\OAuth2\Client\Provider\Exception\IdentityProviderException $e) {
-                exit(_t('SSO_ERROR'). ". " . _t("SSO_ERROR_DETAIL") . $e->getMessage());
+               exit(_t('SSO_ERROR'). ". " . _t("SSO_ERROR_DETAIL") . join(', ', $e->getResponseBody()));
             }
         }
     }
