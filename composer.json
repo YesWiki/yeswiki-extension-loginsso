@@ -1,5 +1,12 @@
 {
-    "require": {
-        "league/oauth2-client": "2.7.0"
-    }
+  "require": {
+    "league/oauth2-client": "2.7.0"
+  },
+  "config": {
+    "platform": {
+      "php": "7.4.0"
+    },
+    "platform-check": true,
+    "sort-packages": true
+  }
 }
