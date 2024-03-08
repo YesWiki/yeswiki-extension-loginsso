@@ -1,12 +1,18 @@
 <?php
-namespace YesWiki;
+
+namespace YesWiki\LoginSso\Handler\Page;
+
 use YesWiki\Bazar\Service\EntryManager;
+use function YesWiki\LoginSso\Lib\bazarUserEntryExists;
+use function YesWiki\LoginSso\Lib\checkBazarMappingConfig;
+use function YesWiki\LoginSso\Lib\createUserBazarEntry;
+use function YesWiki\LoginSso\Lib\genere_nom_user;
 
 /**
  * Handler for creating bazar entry based on SOS server informations
  * 
  * @category YesWiki
- * @package  login-sso
+ * @package  loginsso
  * @author   Florian Schmitt <mrflos@lilo.org>
  * @author   Adrien Cheype <adrien.cheype@gmail.com>
  * @license  https://www.gnu.org/licenses/agpl-3.0.en.html AGPL 3.0
@@ -20,7 +26,7 @@ if (!defined("WIKINI_VERSION")) {
 
 $entryManager = $this->services->get(EntryManager::class);
 
-require_once 'tools/login-sso/libs/login-sso.lib.php';
+require_once __DIR__ .'/../../libs/loginsso.lib.php';
 ob_start();
 
 if (isset($_GET['attr'])) {

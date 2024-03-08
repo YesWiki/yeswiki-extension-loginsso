@@ -1,12 +1,14 @@
 <?php
-namespace YesWiki;
+
+namespace YesWiki\LoginSso\Lib;
+
 use YesWiki\Bazar\Service\EntryManager;
 
 /**
  * Library of SSO login users functions
  *
  * @category YesWiki
- * @package  login-sso
+ * @package  loginsso
  * @author   Florian Schmitt <mrflos@lilo.org>
  * @author   Adrien Cheype <adrien.cheype@gmail.com>
  * @license  https://www.gnu.org/licenses/agpl-3.0.en.html AGPL 3.0

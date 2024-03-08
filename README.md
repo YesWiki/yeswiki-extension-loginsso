@@ -1,4 +1,4 @@
-# yeswiki-extension-login-sso
+# yeswiki-extension-loginsso
 
 Use SSO server authentification in YesWiki
 

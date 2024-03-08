@@ -3,7 +3,7 @@
  * French translation
  * 
  * @category YesWiki
- * @package  login-sso
+ * @package  loginsso
  * @author   Adrien Cheype <adrien.cheype@gmail.com>
  * @license  https://www.gnu.org/licenses/agpl-3.0.en.html AGPL 3.0
  * @link     https://yeswiki.net

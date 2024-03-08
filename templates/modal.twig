@@ -1,0 +1,42 @@
+{% extends "@login/modal.twig" %}
+
+{% block connected %}
+    <a href="#LoginModal" role="button" class="navbar-btn {{ not nobtn ? 'btn btn-default ' ~ btnclass : '' }}" data-toggle="modal">
+        <i class="fa fa-user"></i> {{ user }}
+    </a>
+    <div class="modal fade" id="LoginModal" tabindex="-1" role="dialog" aria-labelledby="LoginModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h3 id="LoginModalLabel">{{ _t('LOGIN_CONNECTED_AS') }} {{ user }}</h3>
+                </div>
+
+                <div class="modal-footer">
+                    {{ block('logoutLink') }}
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div> <!-- /#LoginModal-->
+{% endblock %}
+
+{% block form %}
+{#    <div id="ConnectionDetails">#}
+{#        <?php echo $ConnectionDetails; ?>#}
+{#    </div>#}
+    <div class="provider-container" style="display: flex; justify-content: center; margin-top: 20px">
+        <ul class="list-inline provider-list">
+            {% for id, confEntry in providers %}
+                <li class="provider-item" style="padding-top: 10px;">
+                    <a
+                            class="{{ confEntry['button_style']['button_class'] }} list-inline"
+                            href="{{ incomingUrl }}&amp;action=connectOAUTH&provider={{ id }}"
+                            title="{{ _t('SSO_CONNECT')  }}"
+                    >
+                        <i class="{{ confEntry['button_style']['button_icon'] }}"></i> {{ confEntry['button_style']['button_label'] }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}

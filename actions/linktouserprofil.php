@@ -7,7 +7,7 @@
  * @param dash    if dash is equal to  '1', a dash point will be insered before the link
  *
  * @category YesWiki
- * @package  login-sso
+ * @package  loginsso
  * @author   Adrien Cheype <adrien.cheype@gmail.com>
  * @license  https://www.gnu.org/licenses/agpl-3.0.en.html AGPL 3.0
  * @link     https://yeswiki.net
@@ -18,8 +18,8 @@ if (!defined("WIKINI_VERSION")) {
     die("acc&egrave;s direct interdit");
 }
 
-// load the login-sso lib
-require_once 'tools/login-sso/libs/login-sso.lib.php';
+// load the loginsso lib
+require_once 'tools/loginsso/libs/loginsso.lib.php';
 
 $user = $this->GetUser();
 
