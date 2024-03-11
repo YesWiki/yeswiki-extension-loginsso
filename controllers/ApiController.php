@@ -6,9 +6,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use YesWiki\Core\ApiResponse;
 use YesWiki\Core\Controller\AuthController;
+use YesWiki\Core\Entity\User;
 use YesWiki\Core\Service\UserManager;
 use YesWiki\Core\YesWikiController;
 use YesWiki\LoginSso\Service\OAuth2ProviderFactory;
+use YesWiki\LoginSso\Service\UserSSOGroupSync;
 use function YesWiki\LoginSso\Lib\bazarUserEntryExists;
 use function YesWiki\LoginSso\Lib\genere_nom_user;
 
@@ -95,6 +97,12 @@ class ApiController extends YesWikiController
                 $user = $this->wiki->services->get(UserManager::class)->getOneByEmail($email);
             }
 
+            $this->getService(UserSSOGroupSync::class)->syncSsoGroups(
+                $user,
+                $ssoUser[$providerConf['groups_sso_field']],
+                $providerConf['groups_sso_mapping']
+            );
+
             $this->wiki->services->get(AuthController::class)->login($user, true);
 
             $bazarMapping = $providerConf['bazar_mapping'];
@@ -129,5 +137,6 @@ class ApiController extends YesWikiController
             $this->wiki->Redirect($incomingurl);
         }
     }
+
 
 }
