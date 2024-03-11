@@ -31,11 +31,17 @@ class ApiController extends YesWikiController
 
        $providerId = $_SESSION['oauth2provider'];
        $provider = $this->getService(OAuth2ProviderFactory::class)->createProvider($providerId);
-        $token = $provider->getAccessToken('authorization_code', [
-            'code' => $this->wiki->request->query->get('code')
-        ]);
 
-        $ssoUser = $provider->getResourceOwner($token)->toArray();
+       try {
+           $token = $provider->getAccessToken('authorization_code', [
+               'code' => $this->wiki->request->query->get('code')
+           ]);
+
+           $ssoUser = $provider->getResourceOwner($token)->toArray();
+       } catch (\League\OAuth2\Client\Provider\Exception\IdentityProviderException $e) {
+           exit(_t('SSO_ERROR'). ". " . _t("SSO_ERROR_DETAIL") . join(', ', $e->getResponseBody()));
+       }
+
         $incomingurl = $_SESSION['oauth2previousUrl'];
 
         $providerConf = $this->wiki->config['sso_config']['providers'][$_SESSION['oauth2provider']];
