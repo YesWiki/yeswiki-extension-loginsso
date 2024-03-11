@@ -32,8 +32,43 @@ class LoginAction extends YesWikiAction
         return null;
     }
 
+    private function validateConfig()
+    {
+        // Verification si le fichier de conf est bien renseigné dans toutes les lignes du tableau
+        $allGood = true;
+        $error = [];
+        foreach($this->wiki->config['sso_config']['providers'] as $id => $confEntry) {
+            if (strtolower($confEntry['auth_type']) == strtolower('oauth2')) {
+                if (
+                    empty($confEntry['auth_options']['clientId']) ||
+                    empty($confEntry['auth_options']['clientSecret']) ||
+                    empty($confEntry['auth_options']['urlAuthorize']) ||
+                    empty($confEntry['auth_options']['urlAccessToken']) ||
+                    empty($confEntry['auth_options']['urlResourceOwnerDetails'])
+                ) {
+                    $allGood = false;
+                    $error[] = 'Provider No ' . ($id + 1) . ' : ' . _t('SSO_AUTH_OPTIONS_ERROR');
+                }
+            } else {
+                $allGood = false;
+                $error[] = 'Provider No '. ($id + 1) . ' : ' . _t('SSO_AUTH_TYPE_ERROR');
+            }
+
+            if (!isset($confEntry['email_sso_field'])) {
+                $allGood = false;
+                $error[] = 'Provider No '. ($id + 1) . ' : ' . _t('SSO_USER_EMAIL_REQUIRED');
+            }
+        }
+        if (!$allGood) {
+            throw new \RuntimeException(
+                _t('action {{login}}') . implode(',', $error),
+            );
+        }
+    }
+
     private function renderDefault(): string
     {
+        $this->validateConfig();
         // classe css pour les boutons
         $btnclass = $this->wiki->GetParameter("btnclass");
         if (empty($btnclass)) {

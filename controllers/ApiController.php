@@ -59,8 +59,11 @@ class ApiController extends YesWikiController
                 // the username will be an unique identifier created by genere_nom_wiki once the 'create_user_from' defined in the config
                 // file is applied
                 $userTitle = $providerConf['create_user_from'];
-                foreach ($ssoUser as $ssoField => $ssoValue)
-                    $userTitle = str_replace("#[$ssoField]", $ssoUser[$ssoField], $userTitle);
+                foreach ($ssoUser as $ssoField => $ssoValue) {
+                    if(\is_string($ssoValue)) {
+                        $userTitle = str_replace("#[$ssoField]", $ssoUser[$ssoField], $userTitle);
+                    }
+                }
                 $username = genere_nom_user($userTitle);
 
                 // création de l'utilisateur s'il n'existe pas dans yeswiki
@@ -99,8 +102,8 @@ class ApiController extends YesWikiController
 
             $this->getService(UserSSOGroupSync::class)->syncSsoGroups(
                 $user,
-                $ssoUser[$providerConf['groups_sso_field']],
-                $providerConf['groups_sso_mapping']
+                $ssoUser[$providerConf['groups_sso_field']] ?? [],
+                $providerConf['groups_sso_mapping'] ?? []
             );
 
             $this->wiki->services->get(AuthController::class)->login($user, true);
