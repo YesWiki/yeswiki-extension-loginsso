@@ -51,7 +51,12 @@ class LoginAction extends YesWikiAction
                 }
             } else {
                 $allGood = false;
-                $error[] = 'Provider No '. ($id + 1) . ' : ' . _t('SSO_AUTH_TYPE_ERROR');
+                $error[] = 'Provider No ' . ($id + 1) . ' : ' . _t('SSO_AUTH_TYPE_ERROR');
+            }
+
+            if (!isset($confEntry['id_sso_field'])) {
+                $allGood = false;
+                $error[] = 'Provider No '. ($id + 1) . ' : ' . _t('SSO_USER_ID_REQUIRED');
             }
 
             if (!isset($confEntry['email_sso_field'])) {

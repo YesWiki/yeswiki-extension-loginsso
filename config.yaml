@@ -15,7 +15,9 @@
 #          urlAuthorize: 'https:#myserver/auth/realms/master/protocol/openid-connect/auth'
 #          urlAccessToken: 'https:#myserver/auth/realms/master/protocol/openid-connect/token'
 #          urlResourceOwnerDetails: 'https:#myserver/auth/realms/master/protocol/openid-connect/userinfo'
-#        # sso server fieldname used for the user email, this email links an SSO user to a yeswiki user
+#        # sso server fieldname used for the user id, this field links an SSO user to a yeswiki user
+#        id_sso_field: 'id'
+#        # sso server fieldname used for the user email
 #        email_sso_field: 'email'
 #        groups_sso_field: 'groups'
 #        # map LDAP groups to YesWiki groups. Groups not listed here will be ignored
@@ -99,6 +101,9 @@ services:
     _defaults:
         autowire: true
         public: true
+
+    YesWiki\LoginSso\Controller\:
+        resource: 'controllers/*'
 
     YesWiki\LoginSso\Service\:
         resource: 'services/*'

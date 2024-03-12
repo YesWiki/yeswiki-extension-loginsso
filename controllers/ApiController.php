@@ -7,22 +7,38 @@ use Symfony\Component\Routing\Annotation\Route;
 use YesWiki\Core\ApiResponse;
 use YesWiki\Core\Controller\AuthController;
 use YesWiki\Core\Entity\User;
+use YesWiki\Core\Service\DbService;
 use YesWiki\Core\Service\UserManager;
 use YesWiki\Core\YesWikiController;
 use YesWiki\LoginSso\Service\OAuth2ProviderFactory;
 use YesWiki\LoginSso\Service\UserSSOGroupSync;
 use function YesWiki\LoginSso\Lib\bazarUserEntryExists;
 use function YesWiki\LoginSso\Lib\genere_nom_user;
+use YesWiki\LoginSso\Service\UserManager as LoginSsoUserManager;
 
 require_once __DIR__ . '/../libs/loginsso.lib.php';
 
 class ApiController extends YesWikiController
 {
+    private LoginSsoUserManager $loginSsoUserManager;
+    private UserManager $userManager;
+    private DbService $dbService;
+
+    private function initServices(
+    ) {
+        $this->loginSsoUserManager = $this->getService(LoginSsoUserManager::class);
+        $this->userManager = $this->getService(UserManager::class);
+        $this->dbService = $this->getService(DbService::class);
+    }
+
     /**
      * @Route("/api/auth_sso/callback", methods={"GET"}, options={"acl":{"public"}})
      */
     public function authSsoCallback()
     {
+        // Yeswiki does not support controller instanciation as service for Symfony Routing
+        $this->initServices();
+
         // check given state against previously stored one to mitigate CSRF attack
         if(!isset($_SESSION['oauth2state']) || $this->wiki->request->query->get('state') !== $_SESSION['oauth2state']) {
             unset($_SESSION['oauth2state']);
@@ -30,9 +46,9 @@ class ApiController extends YesWikiController
         }
 
        $providerId = $_SESSION['oauth2provider'];
-       $provider = $this->getService(OAuth2ProviderFactory::class)->createProvider($providerId);
 
        try {
+           $provider = $this->getService(OAuth2ProviderFactory::class)->createProvider($providerId);
            $token = $provider->getAccessToken('authorization_code', [
                'code' => $this->wiki->request->query->get('code')
            ]);
@@ -46,11 +62,11 @@ class ApiController extends YesWikiController
 
         $providerConf = $this->wiki->config['sso_config']['providers'][$_SESSION['oauth2provider']];
 
-        $email = $ssoUser[$providerConf['email_sso_field']];
+        $ssoUserId = $ssoUser[$providerConf['id_sso_field']];
+        $ssoUserEmail = $ssoUser[$providerConf['email_sso_field']];
 
-        // TODO add config parameter to choose if the user is load with its email or its id (in this case, loadUser($id) is called)
+        $user = $this->loginSsoUserManager->getOneById($ssoUserId);
 
-        $user = $this->wiki->services->get(UserManager::class)->getOneByEmail($email);
 
         // if the user creation is forbidden and the user doesn't exists in yeswiki, alert the user he's not allowed
         if (!isset($providerConf['create_user_from']) && !$user) {
@@ -58,94 +74,117 @@ class ApiController extends YesWikiController
             $this->wiki->SetMessage(_t('SSO_USER_NOT_ALLOWED'));
             // remove the get parameters used for the connection
             $this->wiki->redirect($incomingurl);
+            return;
         }
-        else {
-            // if an user with the given email doesn't, create it
-            if (!$user) {
-                // the username will be an unique identifier created by genere_nom_wiki once the 'create_user_from' defined in the config
-                // file is applied
-                $userTitle = $providerConf['create_user_from'];
-                foreach ($ssoUser as $ssoField => $ssoValue) {
-                    if(\is_string($ssoValue)) {
-                        $userTitle = str_replace("#[$ssoField]", $ssoUser[$ssoField], $userTitle);
-                    }
-                }
-                $username = genere_nom_user($userTitle);
 
-                // création de l'utilisateur s'il n'existe pas dans yeswiki
-                $this->wiki->Query(
-                    "INSERT INTO " . $this->wiki->config["table_prefix"] . "users SET " .
-                    "signuptime = now(), " .
-                    "name = '" . mysqli_real_escape_string($this->wiki->dblink, $username) . "', " .
-                    "email = '" . mysqli_real_escape_string($this->wiki->dblink, $email) . "', " .
-                    "password = 'sso'" . ", " .
-                    "motto = ''"
-                );
-                // log in
-                $user = $this->wiki->services->get(UserManager::class)->getOneByEmail($email);
-            }
-
-            $oldUserUpdated = false;
-            // if the user exist already exists from a local account, replace its name and warn the user
-            if ($user['password'] != 'sso'){
-                // the username will be an unique identifier created by genere_nom_wiki once the 'create_user_from' defined in the config
-                // file is applied
-                $userTitle = $providerConf['create_user_from'];
-                foreach ($ssoUser as $ssoField => $ssoValue)
-                    $userTitle = str_replace("#[$ssoField]", $ssoUser[$ssoField], $userTitle);
-                $username = genere_nom_user($userTitle);
-
-                $this->wiki->Query(
-                    "UPDATE " . $this->wiki->config["table_prefix"] . "users SET " .
-                    "name = '" . mysqli_real_escape_string($this->wiki->dblink, $username) . "', " .
-                    "password = 'sso' " .
-                    "WHERE name = '" . mysqli_real_escape_string($this->wiki->dblink, $user['name']) . "'"
-                );
-
-                $oldUserUpdated = true;
-                $user = $this->wiki->services->get(UserManager::class)->getOneByEmail($email);
-            }
-
-            $this->getService(UserSSOGroupSync::class)->syncSsoGroups(
-                $user,
-                $ssoUser[$providerConf['groups_sso_field']] ?? [],
-                $providerConf['groups_sso_mapping'] ?? []
-            );
-
-            $this->wiki->services->get(AuthController::class)->login($user, true);
-
-            $bazarMapping = $providerConf['bazar_mapping'];
-            // if bazarMapping is defined and the bazar user entry does't exist, create it
-            if (!empty($bazarMapping)) {
-                $entry = bazarUserEntryExists($this->wiki->config['sso_config']['bazar_user_entry_id'], $user['name']);
-                if (!$entry) {
-                    $this->wiki->Redirect($this->wiki->href('createentry', 'BazaR', 'provider=' .$providerId. '&username=' . $user['name'] .
-                        ($oldUserUpdated ? '&old_user_updated=yes' : '') . '&attr=' . urlencode(serialize($ssoUser)), false));
-                } else {
-                    // TODO voir si c'est nécessaire mais on peut ici vérifier si les données de la fiche bazar ont changées et les mettre à jour le cas échéant
-                    // $GLOBALS['wiki']->SetMessage('La fiche a été mise à jour');
-                }
+        $oldUserUpdated = false;
+        // if an user with the given id doesn't, create it
+        if ($user === null) {
+            $exisingUserWithSameEmail = $this->userManager->getOneByEmail($ssoUserEmail);
+            if($exisingUserWithSameEmail === null) {
+                $user = $this->createUser($ssoUserId, $ssoUser, $providerConf);
             } else {
-                // if no bazarMapping and an old user was updated, warn the user with a pop up message box
-                if ($oldUserUpdated){
-                    // TODO améliorer ce message box qui ne reste pas assez longtemps
-                    // (soit en passant par une page de transition pour l'afficher, soit en laissant fermer la msg box par l'utilisateur)
-                    $this->wiki->SetMessage(_t('SSO_OLD_USER_UPDATED'));
-                }
+                // Two users cannot exist with same email, so we attach accounts in this case on SSO user
+                $user = $this->attachUserToSsoUserSameEmail($exisingUserWithSameEmail, $ssoUserId);
+                $oldUserUpdated = true;
             }
-
-            // if the PageMenuUser page doesn't exist, create it with a default version
-            if (!$this->wiki->LoadPage('PageMenuUser')) {
-                $this->wiki->SavePage('PageMenuUser', "{{linktouserprofil dash=\"1\"}}\n - [[UserEntries " . _t('SSO_SEE_USER_ENTRIES') . ']]');
-            }
-            // if the UserEntries page doesn't exist, create it with a default version
-            if (!$this->wiki->LoadPage('UserEntries')) {
-                $this->wiki->SavePage('UserEntries', '===='._t('SSO_USER_ENTRIES') . '====' . "\n\n{{userentries}}");
-            }
-
-            $this->wiki->Redirect($incomingurl);
         }
+
+        // Update old user email if has changed on SSO side
+        if($user->getEmail() !== $ssoUserEmail) {
+            $this->dbService->query(
+                sprintf('UPDATE %s SET email = \'%s\' WHERE loginsso_id = \'%s\'',
+                    $this->dbService->prefixTable('users'),
+                    $this->dbService->escape($ssoUserEmail),
+                    $this->dbService->escape($ssoUserId)
+                )
+            );
+        }
+
+        $this->getService(UserSSOGroupSync::class)->syncSsoGroups(
+            $user,
+            $ssoUser[$providerConf['groups_sso_field']] ?? [],
+            $providerConf['groups_sso_mapping'] ?? []
+        );
+
+        $this->wiki->services->get(AuthController::class)->login($user, true);
+
+        $this->postAuthRedirection($providerConf, $providerId, $ssoUser, $user, $incomingurl, $oldUserUpdated);
+
     }
 
+    private function createUser(string $userId, array $ssoUser, array $providerConf): User
+    {
+        // the username will be an unique identifier created by genere_nom_wiki once the 'create_user_from' defined in the config
+        // file is applied
+        $userTitle = $providerConf['create_user_from'];
+        foreach ($ssoUser as $ssoField => $ssoValue) {
+            if(\is_string($ssoValue)) {
+                $userTitle = str_replace("#[$ssoField]", $ssoUser[$ssoField], $userTitle);
+            }
+        }
+        $username = genere_nom_user($userTitle);
 
+        $this->userManager->create([
+            'name' => $username,
+            'email' => $ssoUser[$providerConf['email_sso_field']],
+            'password' => 'sso',
+        ]);
+
+        // Add extension specific information
+        $this->queryAddSsoIdToUser($username, $userId);
+
+        return $this->loginSsoUserManager->getOneById($userId);
+    }
+
+    private function attachUserToSsoUserSameEmail(User $user, string $ssoUserId): User
+    {
+        $this->queryAddSsoIdToUser($user->getName(), $ssoUserId);
+        return $this->loginSsoUserManager->getOneById($ssoUserId);
+    }
+
+    private function queryAddSsoIdToUser(string $username, string $ssoId)
+    {
+        $this->dbService->query(
+            sprintf('UPDATE %s SET loginsso_id = \'%s\', password=\'sso\' WHERE name = \'%s\'',
+                $this->dbService->prefixTable('users'),
+                $this->dbService->escape($ssoId),
+                $this->dbService->escape($username)
+            )
+        );
+    }
+
+    private function postAuthRedirection(array $providerConf, string $providerId, array $ssoUser, User $user, string $incomingurl, bool $oldUserUpdated = false)
+    {
+        $bazarMapping = $providerConf['bazar_mapping'];
+        // if bazarMapping is defined and the bazar user entry does't exist, create it
+        if (!empty($bazarMapping)) {
+            $entry = bazarUserEntryExists($this->wiki->config['sso_config']['bazar_user_entry_id'], $user['name']);
+            if (!$entry) {
+                $this->wiki->Redirect($this->wiki->href('createentry', 'BazaR', 'provider=' .$providerId. '&username=' . $user['name'] .
+                    ($oldUserUpdated ? '&old_user_updated=yes' : '') . '&attr=' . urlencode(serialize($ssoUser)), false));
+            } else {
+                // TODO voir si c'est nécessaire mais on peut ici vérifier si les données de la fiche bazar ont changées et les mettre à jour le cas échéant
+                // $GLOBALS['wiki']->SetMessage('La fiche a été mise à jour');
+            }
+        } else {
+            // if no bazarMapping and an old user was updated, warn the user with a pop up message box
+            if ($oldUserUpdated){
+                // TODO améliorer ce message box qui ne reste pas assez longtemps
+                // (soit en passant par une page de transition pour l'afficher, soit en laissant fermer la msg box par l'utilisateur)
+                $this->wiki->SetMessage(_t('SSO_OLD_USER_UPDATED'));
+            }
+        }
+
+        // if the PageMenuUser page doesn't exist, create it with a default version
+        if (!$this->wiki->LoadPage('PageMenuUser')) {
+            $this->wiki->SavePage('PageMenuUser', "{{linktouserprofil dash=\"1\"}}\n - [[UserEntries " . _t('SSO_SEE_USER_ENTRIES') . ']]');
+        }
+        // if the UserEntries page doesn't exist, create it with a default version
+        if (!$this->wiki->LoadPage('UserEntries')) {
+            $this->wiki->SavePage('UserEntries', '===='._t('SSO_USER_ENTRIES') . '====' . "\n\n{{userentries}}");
+        }
+
+        $this->wiki->Redirect($incomingurl);
+    }
 }
