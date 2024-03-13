@@ -4,6 +4,7 @@ namespace YesWiki\LoginSso\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Tamtamchik\SimpleFlash\Flash;
 use YesWiki\Core\ApiResponse;
 use YesWiki\Core\Controller\AuthController;
 use YesWiki\Core\Entity\User;
@@ -39,10 +40,15 @@ class ApiController extends YesWikiController
         // Yeswiki does not support controller instanciation as service for Symfony Routing
         $this->initServices();
 
+        $incomingurl = $_SESSION['oauth2previousUrl'];
+
+
         // check given state against previously stored one to mitigate CSRF attack
         if(!isset($_SESSION['oauth2state']) || $this->wiki->request->query->get('state') !== $_SESSION['oauth2state']) {
             unset($_SESSION['oauth2state']);
-            exit(_t('SSO_ERROR'));
+            Flash::error(_t('SSO_ERROR'));
+            $this->wiki->redirect($incomingurl);
+            return;
         }
 
        $providerId = $_SESSION['oauth2provider'];
@@ -55,10 +61,11 @@ class ApiController extends YesWikiController
 
            $ssoUser = $provider->getResourceOwner($token)->toArray();
        } catch (\League\OAuth2\Client\Provider\Exception\IdentityProviderException $e) {
-           exit(_t('SSO_ERROR'). ". " . _t("SSO_ERROR_DETAIL") . join(', ', $e->getResponseBody()));
+           Flash::error(_t('SSO_ERROR'). ". " . _t("SSO_ERROR_DETAIL") . join(', ', $e->getResponseBody()));
+           $this->wiki->redirect($incomingurl);
+           return;
        }
 
-        $incomingurl = $_SESSION['oauth2previousUrl'];
 
         $providerConf = $this->wiki->config['sso_config']['providers'][$_SESSION['oauth2provider']];
 
@@ -70,8 +77,7 @@ class ApiController extends YesWikiController
 
         // if the user creation is forbidden and the user doesn't exists in yeswiki, alert the user he's not allowed
         if (!isset($providerConf['create_user_from']) && !$user) {
-            // TODO améliorer ce message box qui ne reste pas assez longtemps
-            $this->wiki->SetMessage(_t('SSO_USER_NOT_ALLOWED'));
+            Flash::error(_t('SSO_USER_NOT_ALLOWED'));
             // remove the get parameters used for the connection
             $this->wiki->redirect($incomingurl);
             return;
@@ -172,7 +178,7 @@ class ApiController extends YesWikiController
             if ($oldUserUpdated){
                 // TODO améliorer ce message box qui ne reste pas assez longtemps
                 // (soit en passant par une page de transition pour l'afficher, soit en laissant fermer la msg box par l'utilisateur)
-                $this->wiki->SetMessage(_t('SSO_OLD_USER_UPDATED'));
+                Flash::info(_t('SSO_OLD_USER_UPDATED'));
             }
         }
 
