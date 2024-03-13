@@ -33,7 +33,7 @@ $GLOBALS['translations'] = array_merge(
         'SSO_USER_NOT_FOUND' => 'Erreur dans l\'affichage des fiches. L\'utilisateur suivant n\'existe pas : ',
         // same msg exists in bazar : BAZ_PAS_DE_FICHES_SAUVEES_EN_VOTRE_NOM
         'SSO_NO_USER_ENTRIES' => 'Vous n\'avez aucune fiche enregistr&eacute;e pour l\'instant.',
-        'SSO_OLD_USER_UPDATED' => 'Votre compte utilisateur a été mis à jour suite à cette première connexion avec le serveur d\'authentification.<br/><br/><b>Attention</b> : vous n\'êtes dorénavant plus le propriétaire des anciennes fiches et pages que vous aviez. Contactez votre administrateur si vous avez besoin d\'être à nouveau propritétaire de celles-ci.',
+        'SSO_OLD_USER_UPDATED' => 'Votre compte utilisateur a été mis à jour suite à cette première connexion avec le serveur d\'authentification.',
         'SSO_USER_NOT_ALLOWED' => 'Malgré votre connexion au serveur d\'authentification, vous n\'êtes pas autorisé à vous connecter sur ce site.',
     )
 );
