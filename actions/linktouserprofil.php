@@ -14,6 +14,9 @@
  */
 namespace YesWiki;
 
+use function YesWiki\LoginSso\Lib\bazarUserEntryExists;
+
+
 if (!defined("WIKINI_VERSION")) {
     die("acc&egrave;s direct interdit");
 }

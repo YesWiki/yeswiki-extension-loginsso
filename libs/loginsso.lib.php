@@ -126,7 +126,10 @@ function createUserBazarEntry($bazarMapping, $bazarEntryId, $user_title_format, 
         // define the 'bf_titre' entry by replacing the '$user_title_format' field names by their values in the sso fields
         $bf_titre = $user_title_format;
         foreach ($ssoUser as $ssoField => $ssoValue)
-            $bf_titre = str_replace("#[$ssoField]", $ssoUser[$ssoField], $bf_titre);
+            if(\is_string($ssoUser[$ssoField])) {
+                $bf_titre = str_replace("#[$ssoField]", $ssoUser[$ssoField], $bf_titre);
+            }
+
         $fiche['bf_titre'] = $bf_titre;
     }
 
