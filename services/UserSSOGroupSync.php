@@ -31,9 +31,9 @@ class UserSSOGroupSync
         $ssoGroups = array_map(function ($ssoGroup) use ($ssoGroupMapping) {
             return $ssoGroupMapping[$ssoGroup] ?? $ssoGroup;
         }, $ssoGroups);
-        $ssoGroups = array_filter($ssoGroups, function ($group) use ($ssoGroupMapping) {
+        $ssoGroups = array_unique(array_filter($ssoGroups, function ($group) use ($ssoGroupMapping) {
             return in_array($group, $ssoGroupMapping);
-        });
+        }));
 
         $userGroups = $this->userManager->groupsWhereIsMember($user);
         $userGroups = array_filter($userGroups, function ($group) use ($ssoGroupMapping) {
