@@ -1,6 +1,6 @@
 # Changelog
 
-## V1.0.0
+## V1.1.0
 
 This extension is a replacement for the yeswiki-extension-login-sso,
 due to an incompatibility between dash in the extension name and the new autoloading YesWiki system.
