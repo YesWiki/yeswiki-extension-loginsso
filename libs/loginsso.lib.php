@@ -1,12 +1,14 @@
 <?php
-namespace YesWiki;
+
+namespace YesWiki\LoginSso\Lib;
+
 use YesWiki\Bazar\Service\EntryManager;
 
 /**
  * Library of SSO login users functions
  *
  * @category YesWiki
- * @package  login-sso
+ * @package  loginsso
  * @author   Florian Schmitt <mrflos@lilo.org>
  * @author   Adrien Cheype <adrien.cheype@gmail.com>
  * @license  https://www.gnu.org/licenses/agpl-3.0.en.html AGPL 3.0
@@ -124,7 +126,10 @@ function createUserBazarEntry($bazarMapping, $bazarEntryId, $user_title_format, 
         // define the 'bf_titre' entry by replacing the '$user_title_format' field names by their values in the sso fields
         $bf_titre = $user_title_format;
         foreach ($ssoUser as $ssoField => $ssoValue)
-            $bf_titre = str_replace("#[$ssoField]", $ssoUser[$ssoField], $bf_titre);
+            if(\is_string($ssoUser[$ssoField])) {
+                $bf_titre = str_replace("#[$ssoField]", $ssoUser[$ssoField], $bf_titre);
+            }
+
         $fiche['bf_titre'] = $bf_titre;
     }
 

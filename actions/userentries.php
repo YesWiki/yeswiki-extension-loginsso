@@ -5,7 +5,7 @@
  * @param username   the name of the user whose we want to see the entries. Without this parameter, it will show the connected user's ones.
  *
  * @category YesWiki
- * @package  login-sso
+ * @package  loginsso
  * @author   Adrien Cheype <adrien.cheype@gmail.com>
  * @license  https://www.gnu.org/licenses/agpl-3.0.en.html AGPL 3.0
  * @link     https://yeswiki.net
@@ -36,7 +36,7 @@ if (!empty($user)) {
         // if user not found
         echo '<div class="alert alert-danger">' . _t('SSO_USER_NOT_FOUND') . $username . '.</div>' . "\n";
     } else {
-        // we are looking for a custom template in the themes/tools/login-sso/templates directory
+        // we are looking for a custom template in the themes/tools/loginsso/templates directory
         $GLOBALS['_BAZAR_']['templates'] = $this->GetParameter("template");
         if (empty($GLOBALS['_BAZAR_']['templates'])) {
             $GLOBALS['_BAZAR_']['templates'] = $GLOBALS['wiki']->config['default_bazar_template'];

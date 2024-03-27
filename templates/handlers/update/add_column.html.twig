@@ -1,0 +1,8 @@
+<strong>LoginSso</strong><br />
+ℹ️ Add login_sso_id column on {{ tableName }}<br />
+{% if columnExist %}
+    ✅ The table {{ tableName }} already have column login_sso_id<br />
+{% else %}
+    ✅ Done !
+{% endif %}
+<hr>
