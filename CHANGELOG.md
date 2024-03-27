@@ -4,7 +4,7 @@
 
 This extension is a replacement for the yeswiki-extension-login-sso,
 due to an incompatibility between dash in the extension name and the new autoloading YesWiki system.
-It also refactor the code to use the new YesWiki class based action system.
+It also refactor the code to use the new YesWiki class based action system and twig templates.
 
 Then it add a few new features for better SSO integration :
 
