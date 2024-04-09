@@ -1,5 +1,9 @@
 # Changelog
 
+## V1.1.1
+
+Allow display initials instead of username on login modal
+
 ## V1.1.0
 
 This extension is a replacement for the yeswiki-extension-login-sso,
