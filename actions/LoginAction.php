@@ -81,15 +81,29 @@ class LoginAction extends YesWikiAction
         }
 
         $user = $this->authController->getLoggedUser();
+        $username = $user["name"] ?? '';
+        if($this->wiki->config['sso_config']['login_username_initials'] ?? false) {
+            $username = $this->nameInitials($username);
+        }
         return $this->render('@loginsso/modal.twig', [
             "connected" => !empty($user),
-            "user" => $user["name"] ?? '',
+            "user" => $username,
             "email" => $user["email"] ?? '',
             "providers" => $this->wiki->config['sso_config']['providers'],
             "incomingUrl" => $this->wiki->request->getUri(),
             "btnClass" => $btnclass,
             "nobtn" => $this->wiki->GetParameter("nobtn")
         ]);
+    }
+
+    private function nameInitials(string $name)
+    {
+        $name = explode(' ', $name);
+        $initials = '';
+        foreach ($name as $n) {
+            $initials .= mb_strtoupper($n[0]??'') . ' ';
+        }
+        return trim($initials);
     }
 
     private function redirectOAuth(int $providerId)

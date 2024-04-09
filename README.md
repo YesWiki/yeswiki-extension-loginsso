@@ -16,6 +16,8 @@ After installation, you must add the following configuration in your waka.config
      * don't declare it, if you don't need to have bazar entries related to users
     */
     'bazar_user_entry_id' => 1000,
+    // if true, the display the initials of the user name instead of the full name on login modal
+    'login_username_initials' => false,
     // each entry here is an array corresponding to a SSO provider
     'providers' => [
         [
