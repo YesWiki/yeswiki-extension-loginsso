@@ -98,9 +98,16 @@ class LoginAction extends YesWikiAction
 
     private function nameInitials(string $name)
     {
-        $name = explode(' ', $name);
+        $nameExploded = explode(' ', $name);
+        if(count($nameExploded) === 1) {
+            $nameExploded = preg_split('/(?=[A-Z])/', $name);
+        }
+        if($nameExploded === false) {
+            return $name;
+        }
+
         $initials = '';
-        foreach ($name as $n) {
+        foreach ($nameExploded as $n) {
             $initials .= mb_strtoupper($n[0]??'') . ' ';
         }
         return trim($initials);

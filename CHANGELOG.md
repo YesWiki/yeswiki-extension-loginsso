@@ -1,5 +1,9 @@
 # Changelog
 
+## V1.1.2
+
+Allow initial for username generation when username in PascalCase or camelCase
+
 ## V1.1.1
 
 Allow display initials instead of username on login modal
