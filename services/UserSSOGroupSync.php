@@ -49,7 +49,7 @@ class UserSSOGroupSync
         foreach (array_diff($userGroups, $ssoGroups) as $groupToRemove) {
             $groupAcl = $this->wiki->GetGroupACL($groupToRemove) ?? '';
             $groupAcl = str_replace($user->getName(), '', $groupAcl);
-            $groupAcl = str_replace(PHP_EOL . PHP_EOL, '', $groupAcl);
+            $groupAcl = str_replace(PHP_EOL . PHP_EOL, PHP_EOL, $groupAcl);
             $this->updateGroupAcl($groupToRemove, trim($groupAcl));
         }
 
