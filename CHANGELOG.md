@@ -7,6 +7,7 @@ Allow initial for username generation when username in PascalCase or camelCase
 ## V1.1.1
 
 Allow display initials instead of username on login modal
+Fix group config invalid on user group suppression
 
 ## V1.1.0
 
