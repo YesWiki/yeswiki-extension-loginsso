@@ -26,8 +26,8 @@ After installation, you must add the following configuration in your waka.config
             'auth_options' => [
                 'clientId' => 'myclientid',
                 'clientSecret' => 'mysecretclientkey',
-                'urlAuthorize'=> 'https:#myserver/auth/realms/master/protocol/openid-connect/auth',
-                'urlAccessToken ' => 'https:#myserver/auth/realms/master/protocol/openid-connect/token',
+                'urlAuthorize' => 'https:#myserver/auth/realms/master/protocol/openid-connect/auth',
+                'urlAccessToken' => 'https:#myserver/auth/realms/master/protocol/openid-connect/token',
                 'urlResourceOwnerDetails' => 'https:#myserver/auth/realms/master/protocol/openid-connect/userinfo',
             ],
             // sso server fieldname used for the user id, this field links an SSO user to a yeswiki user
