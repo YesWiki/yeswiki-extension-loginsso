@@ -26,7 +26,7 @@ After installation, you must add the following configuration in your waka.config
             'auth_options' => [
                 'clientId' => 'myclientid',
                 'clientSecret' => 'mysecretclientkey',
-                'urlAuthorize' => 'https:#myserver/auth/realms/master/protocol/openid-connect/auth',
+                'urlAuthorize'=> 'https:#myserver/auth/realms/master/protocol/openid-connect/auth',
                 'urlAccessToken ' => 'https:#myserver/auth/realms/master/protocol/openid-connect/token',
                 'urlResourceOwnerDetails' => 'https:#myserver/auth/realms/master/protocol/openid-connect/userinfo',
             ],
