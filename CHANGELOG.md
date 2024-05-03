@@ -1,5 +1,10 @@
 # Changelog
 
+## V1.1.3
+
+Fix typo in documentation
+Improve error handling on 
+
 ## V1.1.2
 
 Allow initial for username generation when username in PascalCase or camelCase

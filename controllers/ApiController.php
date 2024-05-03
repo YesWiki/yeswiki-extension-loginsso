@@ -40,8 +40,7 @@ class ApiController extends YesWikiController
         // Yeswiki does not support controller instanciation as service for Symfony Routing
         $this->initServices();
 
-        $incomingurl = $_SESSION['oauth2previousUrl'];
-
+        $incomingurl = $_SESSION['oauth2previousUrl'] ?? '/';
 
         // check given state against previously stored one to mitigate CSRF attack
         if(!isset($_SESSION['oauth2state']) || $this->wiki->request->query->get('state') !== $_SESSION['oauth2state']) {
@@ -69,8 +68,8 @@ class ApiController extends YesWikiController
 
         $providerConf = $this->wiki->config['sso_config']['providers'][$_SESSION['oauth2provider']];
 
-        $ssoUserId = $ssoUser[$providerConf['id_sso_field']];
-        $ssoUserEmail = $ssoUser[$providerConf['email_sso_field']];
+        $ssoUserId = $this->getFieldFromTokenOrExit($ssoUser, $providerConf['id_sso_field'], $incomingurl);
+        $ssoUserEmail = $this->getFieldFromTokenOrExit($ssoUser, $providerConf['email_sso_field'], $incomingurl);
 
         $user = $this->loginSsoUserManager->getOneById($ssoUserId);
 
@@ -117,6 +116,15 @@ class ApiController extends YesWikiController
 
         $this->postAuthRedirection($providerConf, $providerId, $ssoUser, $user, $incomingurl, $oldUserUpdated);
 
+    }
+
+    private function getFieldFromTokenOrExit(array $token, string $field, string $incomingUrl): string
+    {
+        if(!isset($token[$field])) {
+            Flash::error(_t('SSO_ERROR_FIELD_NOT_FOUND', ['needle' => $field, 'fields' => implode(', ', array_keys($token))]));
+            $this->wiki->redirect($incomingUrl); // Redirect force exit the script
+        }
+        return $token[$field];
     }
 
     private function createUser(string $userId, array $ssoUser, array $providerConf): User

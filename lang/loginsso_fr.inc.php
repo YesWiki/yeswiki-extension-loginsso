@@ -20,6 +20,7 @@ $GLOBALS['translations'] = array_merge(
         'SSO_CONFIG_ERROR' => 'Une erreur de paramétrage du module de connexion SSO a été détectée dans le fichier de configuration. Veuillez vous référer à la documentation pour écrire les bons paramètres.',
         'SSO_ERROR' => 'Erreur detecté dans le module de connexion SSO, vous n\'êtes pas connecté',
         'SSO_ERROR_DETAIL' => 'Détail : ',
+        'SSO_ERROR_FIELD_NOT_FOUND' => 'Impossible de trouver le champ "%{needle}" dans les informations utilisateurs fournies par le serveur. Les champs disponibles sont : %{fields}',
         'SSO_ACTION_ERROR' => 'Erreur détectée dans l\'action login du module login_sso : ',
         'SSO_AUTH_TYPE_ERROR' => 'Le type d\'auth défini dans le fichier de configuration n\'est pas supporté (\'cas\' ou \'oauth2\' disponible)',
         'SSO_AUTH_OPTIONS_ERROR' => 'les options d\'authentification dans \'auth_options\' doivent être renseignés : \'clientId\', \'clientSecret\', \'redirectUri\', \'urlAuthorize\', \'urlAccessToken\', \'urlResourceOwnerDetails\'',
