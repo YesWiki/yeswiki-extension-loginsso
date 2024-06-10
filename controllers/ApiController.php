@@ -33,7 +33,11 @@ class ApiController extends YesWikiController
     }
 
     /**
+     * Due do diffrent URL encoding from server and processing done in YesWiki::RunSpecialPages
+     * The two URLs can match so we bind on two
+     *
      * @Route("/api/auth_sso/callback", methods={"GET"}, options={"acl":{"public"}})
+     * @Route("/api/auth_sso", methods={"GET"}, options={"acl":{"public"}})
      */
     public function authSsoCallback()
     {
