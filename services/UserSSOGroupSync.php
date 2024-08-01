@@ -19,11 +19,12 @@ class UserSSOGroupSync
 
     /**
      * @param string|string[] $ssoGroups
+     *
      * @return void
      */
     public function syncSsoGroups(User $user, $ssoGroups, $ssoGroupMapping)
     {
-        if(!is_array($ssoGroups)) { // Some providers return a string instead of an array if user has one group
+        if (!is_array($ssoGroups)) { // Some providers return a string instead of an array if user has one group
             $ssoGroups = [$ssoGroups];
         }
 
@@ -52,7 +53,6 @@ class UserSSOGroupSync
             $groupAcl = str_replace(PHP_EOL . PHP_EOL, PHP_EOL, $groupAcl);
             $this->updateGroupAcl($groupToRemove, trim($groupAcl));
         }
-
     }
 
     private function updateGroupAcl(string $group, string $acl): bool
@@ -64,11 +64,10 @@ class UserSSOGroupSync
             } else {
                 $this->wiki->SetMessage(_t('ERROR_WHILE_SAVING_GROUP') . ' ' . ucfirst($group) . ' (' . _t('ERROR_CODE') . ' ' . $result . ')');
             }
+
             return false;
         }
 
         return true;
     }
-
-
 }

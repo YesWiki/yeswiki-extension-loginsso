@@ -2,20 +2,20 @@
 
 namespace YesWiki\LoginSso\Controller;
 
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Tamtamchik\SimpleFlash\Flash;
-use YesWiki\Core\ApiResponse;
 use YesWiki\Core\Controller\AuthController;
 use YesWiki\Core\Entity\User;
 use YesWiki\Core\Service\DbService;
 use YesWiki\Core\Service\UserManager;
 use YesWiki\Core\YesWikiController;
-use YesWiki\LoginSso\Service\OAuth2ProviderFactory;
-use YesWiki\LoginSso\Service\UserSSOGroupSync;
+
 use function YesWiki\LoginSso\Lib\bazarUserEntryExists;
 use function YesWiki\LoginSso\Lib\genere_nom_user;
+
+use YesWiki\LoginSso\Service\OAuth2ProviderFactory;
 use YesWiki\LoginSso\Service\UserManager as LoginSsoUserManager;
+use YesWiki\LoginSso\Service\UserSSOGroupSync;
 
 require_once __DIR__ . '/../libs/loginsso.lib.php';
 
@@ -43,28 +43,29 @@ class ApiController extends YesWikiController
         $incomingurl = $_SESSION['oauth2previousUrl'] ?? '/';
 
         // check given state against previously stored one to mitigate CSRF attack
-        if(!isset($_SESSION['oauth2state']) || $this->wiki->request->query->get('state') !== $_SESSION['oauth2state']) {
+        if (!isset($_SESSION['oauth2state']) || $this->wiki->request->query->get('state') !== $_SESSION['oauth2state']) {
             unset($_SESSION['oauth2state']);
             Flash::error(_t('SSO_ERROR'));
             $this->wiki->redirect($incomingurl);
+
             return;
         }
 
-       $providerId = $_SESSION['oauth2provider'];
+        $providerId = $_SESSION['oauth2provider'];
 
-       try {
-           $provider = $this->getService(OAuth2ProviderFactory::class)->createProvider($providerId);
-           $token = $provider->getAccessToken('authorization_code', [
-               'code' => $this->wiki->request->query->get('code')
-           ]);
+        try {
+            $provider = $this->getService(OAuth2ProviderFactory::class)->createProvider($providerId);
+            $token = $provider->getAccessToken('authorization_code', [
+                'code' => $this->wiki->request->query->get('code'),
+            ]);
 
-           $ssoUser = $provider->getResourceOwner($token)->toArray();
-       } catch (\League\OAuth2\Client\Provider\Exception\IdentityProviderException $e) {
-           Flash::error(_t('SSO_ERROR'). ". " . _t("SSO_ERROR_DETAIL") . join(', ', $e->getResponseBody()));
-           $this->wiki->redirect($incomingurl);
-           return;
-       }
+            $ssoUser = $provider->getResourceOwner($token)->toArray();
+        } catch (\League\OAuth2\Client\Provider\Exception\IdentityProviderException $e) {
+            Flash::error(_t('SSO_ERROR') . '. ' . _t('SSO_ERROR_DETAIL') . join(', ', $e->getResponseBody()));
+            $this->wiki->redirect($incomingurl);
 
+            return;
+        }
 
         $providerConf = $this->wiki->config['sso_config']['providers'][$_SESSION['oauth2provider']];
 
@@ -73,12 +74,12 @@ class ApiController extends YesWikiController
 
         $user = $this->loginSsoUserManager->getOneById($ssoUserId);
 
-
         // if the user creation is forbidden and the user doesn't exists in yeswiki, alert the user he's not allowed
         if (!isset($providerConf['create_user_from']) && !$user) {
             Flash::error(_t('SSO_USER_NOT_ALLOWED'));
             // remove the get parameters used for the connection
             $this->wiki->redirect($incomingurl);
+
             return;
         }
 
@@ -86,7 +87,7 @@ class ApiController extends YesWikiController
         // if an user with the given id doesn't, create it
         if ($user === null) {
             $exisingUserWithSameEmail = $this->userManager->getOneByEmail($ssoUserEmail);
-            if($exisingUserWithSameEmail === null) {
+            if ($exisingUserWithSameEmail === null) {
                 $user = $this->createUser($ssoUserId, $ssoUser, $providerConf);
             } else {
                 // Two users cannot exist with same email, so we attach accounts in this case on SSO user
@@ -96,9 +97,10 @@ class ApiController extends YesWikiController
         }
 
         // Update old user email if has changed on SSO side
-        if($user->getEmail() !== $ssoUserEmail) {
+        if ($user->getEmail() !== $ssoUserEmail) {
             $this->dbService->query(
-                sprintf('UPDATE %s SET email = \'%s\' WHERE loginsso_id = \'%s\'',
+                sprintf(
+                    'UPDATE %s SET email = \'%s\' WHERE loginsso_id = \'%s\'',
                     $this->dbService->prefixTable('users'),
                     $this->dbService->escape($ssoUserEmail),
                     $this->dbService->escape($ssoUserId)
@@ -115,15 +117,15 @@ class ApiController extends YesWikiController
         $this->wiki->services->get(AuthController::class)->login($user, true);
 
         $this->postAuthRedirection($providerConf, $providerId, $ssoUser, $user, $incomingurl, $oldUserUpdated);
-
     }
 
     private function getFieldFromTokenOrExit(array $token, string $field, string $incomingUrl): string
     {
-        if(!isset($token[$field])) {
+        if (!isset($token[$field])) {
             Flash::error(_t('SSO_ERROR_FIELD_NOT_FOUND', ['needle' => $field, 'fields' => implode(', ', array_keys($token))]));
             $this->wiki->redirect($incomingUrl); // Redirect force exit the script
         }
+
         return $token[$field];
     }
 
@@ -133,7 +135,7 @@ class ApiController extends YesWikiController
         // file is applied
         $userTitle = $providerConf['create_user_from'];
         foreach ($ssoUser as $ssoField => $ssoValue) {
-            if(\is_string($ssoValue)) {
+            if (\is_string($ssoValue)) {
                 $userTitle = str_replace("#[$ssoField]", $ssoUser[$ssoField], $userTitle);
             }
         }
@@ -154,13 +156,15 @@ class ApiController extends YesWikiController
     private function attachUserToSsoUserSameEmail(User $user, string $ssoUserId): User
     {
         $this->queryAddSsoIdToUser($user->getName(), $ssoUserId);
+
         return $this->loginSsoUserManager->getOneById($ssoUserId);
     }
 
     private function queryAddSsoIdToUser(string $username, string $ssoId)
     {
         $this->dbService->query(
-            sprintf('UPDATE %s SET loginsso_id = \'%s\', password=\'sso\' WHERE name = \'%s\'',
+            sprintf(
+                'UPDATE %s SET loginsso_id = \'%s\', password=\'sso\' WHERE name = \'%s\'',
                 $this->dbService->prefixTable('users'),
                 $this->dbService->escape($ssoId),
                 $this->dbService->escape($username)
@@ -175,7 +179,7 @@ class ApiController extends YesWikiController
         if (!empty($bazarMapping)) {
             $entry = bazarUserEntryExists($this->wiki->config['sso_config']['bazar_user_entry_id'], $user['name']);
             if (!$entry) {
-                $this->wiki->Redirect($this->wiki->href('createentry', 'BazaR', 'provider=' .$providerId. '&username=' . $user['name'] .
+                $this->wiki->Redirect($this->wiki->href('createentry', 'BazaR', 'provider=' . $providerId . '&username=' . $user['name'] .
                     ($oldUserUpdated ? '&old_user_updated=yes' : '') . '&attr=' . urlencode(serialize($ssoUser)), false));
             } else {
                 // TODO voir si c'est nécessaire mais on peut ici vérifier si les données de la fiche bazar ont changées et les mettre à jour le cas échéant
@@ -183,7 +187,7 @@ class ApiController extends YesWikiController
             }
         } else {
             // if no bazarMapping and an old user was updated, warn the user with a pop up message box
-            if ($oldUserUpdated){
+            if ($oldUserUpdated) {
                 // TODO améliorer ce message box qui ne reste pas assez longtemps
                 // (soit en passant par une page de transition pour l'afficher, soit en laissant fermer la msg box par l'utilisateur)
                 Flash::info(_t('SSO_OLD_USER_UPDATED'));
@@ -196,7 +200,7 @@ class ApiController extends YesWikiController
         }
         // if the UserEntries page doesn't exist, create it with a default version
         if (!$this->wiki->LoadPage('UserEntries')) {
-            $this->wiki->SavePage('UserEntries', '===='._t('SSO_USER_ENTRIES') . '====' . "\n\n{{userentries}}");
+            $this->wiki->SavePage('UserEntries', '====' . _t('SSO_USER_ENTRIES') . '====' . "\n\n{{userentries}}");
         }
 
         $this->wiki->Redirect($incomingurl);

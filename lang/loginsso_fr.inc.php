@@ -1,17 +1,17 @@
 <?php
 /**
- * French translation
- * 
+ * French translation.
+ *
  * @category YesWiki
- * @package  loginsso
+ *
  * @author   Adrien Cheype <adrien.cheype@gmail.com>
  * @license  https://www.gnu.org/licenses/agpl-3.0.en.html AGPL 3.0
- * @link     https://yeswiki.net
+ *
+ * @see     https://yeswiki.net
  */
-
 $GLOBALS['translations'] = array_merge(
     $GLOBALS['translations'],
-    array(
+    [
         'SSO_CONNECT' => 'Connecter avec ce serveur d\'authentification',
         'SSO_ENTRY_CREATE' => 'Création de votre fiche',
         'SSO_YES_CONSENT' => 'OK, j\'accepte !',
@@ -36,5 +36,5 @@ $GLOBALS['translations'] = array_merge(
         'SSO_NO_USER_ENTRIES' => 'Vous n\'avez aucune fiche enregistr&eacute;e pour l\'instant.',
         'SSO_OLD_USER_UPDATED' => 'Votre compte utilisateur a été mis à jour suite à cette première connexion avec le serveur d\'authentification.',
         'SSO_USER_NOT_ALLOWED' => 'Malgré votre connexion au serveur d\'authentification, vous n\'êtes pas autorisé à vous connecter sur ce site.',
-    )
+    ]
 );

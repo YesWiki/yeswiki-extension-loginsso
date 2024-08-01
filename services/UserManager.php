@@ -23,7 +23,7 @@ class UserManager
                 'select * from' . $this->dbService->prefixTable('users') . " where loginsso_id = '" . $this->dbService->escape($id) . "' limit 1"
             );
 
-        if(empty($userAsArray)) {
+        if (empty($userAsArray)) {
             return null;
         }
 
