@@ -1,5 +1,9 @@
 # Changelog
 
+## V1.1.4
+
+add custom scope option
+
 ## V1.1.3
 
 Fix typo in documentation
