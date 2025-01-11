@@ -24,7 +24,7 @@ class OAuth2ProviderFactory
             'urlAuthorize' => $confEntry['auth_options']['urlAuthorize'],
             'urlAccessToken' => $confEntry['auth_options']['urlAccessToken'],
             'urlResourceOwnerDetails' => $confEntry['auth_options']['urlResourceOwnerDetails'],
-            'scopes' => ['openid'],
+            'scopes' => [ $confEntry['auth_options']['scope'] ] ?? ['openid'],
         ]);
     }
 }
