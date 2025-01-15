@@ -30,7 +30,7 @@ After installation, you must add the following configuration in your waka.config
                 'urlAccessToken' => 'https:#myserver/auth/realms/master/protocol/openid-connect/token',
                 'urlResourceOwnerDetails' => 'https:#myserver/auth/realms/master/protocol/openid-connect/userinfo',
                 // optionnal set custom scope for openid token. Default to openid
-                'scope' => ['openid', 'custom_scope'],
+                'scopes' => ['openid', 'custom_scope'],
                  // optionnal set custom scope seperator. Default to ' '
                 'scopeSeparator' => ' ',
             ],
