@@ -60,8 +60,12 @@ class ApiController extends YesWikiController
             ]);
 
             $ssoUser = $provider->getResourceOwner($token)->toArray();
-        } catch (\League\OAuth2\Client\Provider\Exception\IdentityProviderException $e) {
-            Flash::error(_t('SSO_ERROR') . '. ' . _t('SSO_ERROR_DETAIL') . join(', ', $e->getResponseBody()));
+        } catch (\Exception $e) {
+            $message = $e->getMessage();
+            if($e instanceof \League\OAuth2\Client\Provider\Exception\IdentityProviderException) {
+                $message = join(', ', $e->getResponseBody());
+            }
+            Flash::error(_t('SSO_ERROR') . '. ' . _t('SSO_ERROR_DETAIL') . $message);
             $this->wiki->redirect($incomingurl);
 
             return;

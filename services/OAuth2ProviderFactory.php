@@ -17,10 +17,15 @@ class OAuth2ProviderFactory
     {
         $confEntry = $this->wiki->config['sso_config']['providers'][$providerId]; // TODO: multiple providers
 
+        $redirectUri = $this->wiki->getBaseUrl() . '/?api/auth_sso/callback';
+        if($confEntry['auth_options']['addFinalEqual'] ?? true) {
+            $redirectUri .= '=';
+        }
+
         return new \League\OAuth2\Client\Provider\GenericProvider([
             'clientId' => $confEntry['auth_options']['clientId'],    // The client ID assigned to you by the provider
             'clientSecret' => $confEntry['auth_options']['clientSecret'],   // The client password assigned to you by the provider
-            'redirectUri' => $this->wiki->getBaseUrl() . '/?api/auth_sso/callback=', // Final '=' mandatory for lemonldap compatibility
+            'redirectUri' => $redirectUri,
             'urlAuthorize' => $confEntry['auth_options']['urlAuthorize'],
             'urlAccessToken' => $confEntry['auth_options']['urlAccessToken'],
             'urlResourceOwnerDetails' => $confEntry['auth_options']['urlResourceOwnerDetails'],

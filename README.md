@@ -33,6 +33,8 @@ After installation, you must add the following configuration in your waka.config
                 'scopes' => ['openid', 'custom_scope'],
                  // optionnal set custom scope seperator. Default to ' '
                 'scopeSeparator' => ' ',
+                // optionnal add a final equal to the redirect uri. Somme providers need it, some don't. Default to yes
+                'addFinalEqual' => true,
             ],
             // sso server fieldname used for the user id, this field links an SSO user to a yeswiki user
             'id_sso_field' => 'id',
@@ -154,7 +156,9 @@ After installation, you must add the following configuration in your waka.config
 
 You must configure the OIDC server to accept the redirection from your YesWiki instance.
 Add the following URL to the list of allowed redirections:
-`https://[wiki]/?api/auth_sso/callback=`
+
+If `addFinalEqual` is set to true or not defined, the URL must be `https://[wiki]/?api/auth_sso/callback=` otherwise it must be
+`https://[wiki]/?api/auth_sso/callback`
 
 ## TODO
 
