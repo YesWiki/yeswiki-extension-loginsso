@@ -2,7 +2,9 @@
 
 ## V1.1.7
 
-Fix migration to Yeswiki 4.5
+**WARNING : this update allow install on YesWiki 4.5 but there is some compatibility issues before YesWiki 4.5.3 when `addFinalEqual`is set to `true` which is the default value**
+
+Partial fix migration to Yeswiki 4.5
 - Fix desc.xml file syntax
 
 ## V1.1.5
