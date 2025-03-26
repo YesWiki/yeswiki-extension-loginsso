@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<plugin name="wkloginsso" version="1.1.6" active="1">
-  <author>Adrien Cheype adrien.cheype@gmail.com</author>
-  <author>Florian Schmitt mrflos@lilo.org</author>
-  <author>Sylvain Lehmann sylvain@lehmann.dev</author>
+<plugin name="wkloginsso" version="1.1.4" active="1">
+  <author>Adrien Cheype <adrien.cheype@gmail.com></author>
+  <author>Florian Schmitt <mrflos@lilo.org></author>
   <label>Identification via un serveur d'authentification unique (SSO)</label>
-  <desc>Authentification sur YesWiki à l'aide d'un serveur SSO OIDC</desc>
+  <desc>Authentification sur YesWiki à l'aide d'un serveur SSO (service CAS ou protocole OAuth2)</desc>
 </plugin>

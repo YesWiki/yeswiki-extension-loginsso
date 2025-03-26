@@ -35,8 +35,6 @@ After installation, you must add the following configuration in your waka.config
                 'scopeSeparator' => ' ',
                 // optionnal add a final equal to the redirect uri. Somme providers need it, some don't. Default to yes
                 'addFinalEqual' => true,
-                // optionnal use a proxy as plain PHP file to handle callback from SSO server in case of incompatibility between the SSO server URL generation and YesWiki routing
-                'useProxyForCallback' => false,
             ],
             // sso server fieldname used for the user id, this field links an SSO user to a yeswiki user
             'id_sso_field' => 'id',
@@ -161,8 +159,6 @@ Add the following URL to the list of allowed redirections:
 
 If `addFinalEqual` is set to true or not defined, the URL must be `https://[wiki]/?api/auth_sso/callback=` otherwise it must be
 `https://[wiki]/?api/auth_sso/callback`
-
-If `useProxyForCallback` is set to true, the URL must be `https://[wiki]/tools/loginsso/proxy_callback.php`, with or without the final equal according to the option.
 
 ## TODO
 
