@@ -1,8 +1,17 @@
 # Changelog
 
-## V1.1.4
+## V1.1.7
+
+Fix migration to Yeswiki 4.5
+- Fix desc.xml file syntax
+
+## V1.1.5
 
 add custom scope option
+
+## V1.1.4
+
+use new conventions from YesWiki
 
 ## V1.1.3
 
