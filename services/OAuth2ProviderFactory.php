@@ -17,7 +17,10 @@ class OAuth2ProviderFactory
     {
         $confEntry = $this->wiki->config['sso_config']['providers'][$providerId]; // TODO: multiple providers
 
-        $redirectUri = $this->wiki->getBaseUrl() . '/?api/auth_sso/callback';
+        $redirectUri = $this->wiki->getBaseUrl() . CallbackPathProvider::CALLBACK_PATH;
+        if($confEntry['auth_options']['useProxyForCallback'] ?? false) {
+            $redirectUri = $this->wiki->getBaseUrl() . '/tools/loginsso/proxy_callback.php';
+        }
         if($confEntry['auth_options']['addFinalEqual'] ?? true) {
             $redirectUri .= '=';
         }
