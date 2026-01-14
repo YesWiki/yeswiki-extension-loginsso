@@ -107,44 +107,44 @@ After installation, you must add the following configuration in your waka.config
                         * see https:#www.php.net/manual/en/function.preg-replace.php for more details about the syntax
                         */
                         'replacement' => '$1|$2'
-                    ],
-                    // access defined to view the user entry ('+' by default)
-                    'read_access_entry' => '+',
-                    // access defined to modify the user entry ('%' by default)
-                    'write_access_entry' => '%',
-                    // message displayed before to create the user entry
-                    'entry_creation_information' => "<p>C'est votre première connexion avec ce compte. Une fiche avec vos informations personnelles va être créée dans le but de faciliter la mise en
-    lien entre les utilisateurs. Les données suivantes - Prénom, Nom, E-mail - vont êtres récupérées directement depuis le serveur d'authentification et pourront être modifiées
-    ou supprimées plus tard à votre convenance dans 'Mes fiches'.</p>",
-                    // if anonymize is defined, a question is asked before to know if the user wants to be anonymous
-                    'anonymize' => [
-                        //  consent question asked before the creation of the user entry (html tag are allowed), if the user responds 'no' his data will be transformed as below
-                        'consent_question' => "<p>Acceptez-vous que ces informations personnelles soient utilisées sur ce site ?<br>
-    Si oui, ces données seront sauvées et rendues visibles aux autres utilisateurs (sauf le mail).<br>
-    Si vous refusez, seules vos initiales et votre pseudo de connexion seront inscrits dans votre fiche, et votre mail sera sauvegardé mais caché aux autres utilisateurs.</p>
-<p>Nous rappelons aussi que nous ne faisons rien d'autre de ces données que de les afficher sur la fiche de votre profil (pas de revente, ni d'exploitation).</p>",
-                        /*
-                        * only the first character will be kept for the followed fields
-                        * each field refers to yeswiki entry field and MUST BE already defined as a key in bazar_mapping.fields
-                        */
-                        'fields_to_anonymize' => [
-                            'bf_nom',
-                            'bf_prenom'
-                        ],
-                        /*
-                         * all the content will be copied for the followed fields
-                         * each field refers to the yeswiki entry field and MUST BE already defined as a key in bazar_mapping.fields
-                         */
-                        'fields_to_keep' => [
-                            'bf_email'
-                        ],
-                        /*
-                        * in case of an anonymize user, 'bf_titre' is replaced by this value
-                        * the username will also be also with an unique word (id) according to this value. Per example, for the value 'Utilisateur anonyme',
-                        * we will have the following ids: first 'UtilisateurAnonyme', then 'UtilisateurAnonyme2' for the second user, etc.
-                        */
-                        'bf_titre_value' => 'Utilisateur anonyme'
                     ]
+                ],
+                // access defined to view the user entry ('+' by default)
+                'read_access_entry' => '+',
+                // access defined to modify the user entry ('%' by default)
+                'write_access_entry' => '%',
+                // message displayed before to create the user entry
+                'entry_creation_information' => "<p>C'est votre première connexion avec ce compte. Une fiche avec vos informations personnelles va être créée dans le but de faciliter la mise en
+                lien entre les utilisateurs. Les données suivantes - Prénom, Nom, E-mail - vont êtres récupérées directement depuis le serveur d'authentification et pourront être modifiées
+                ou supprimées plus tard à votre convenance dans 'Mes fiches'.</p>",
+                // if anonymize is defined, a question is asked before to know if the user wants to be anonymous
+                'anonymize' => [
+                    //  consent question asked before the creation of the user entry (html tag are allowed), if the user responds 'no' his data will be transformed as below
+                    'consent_question' => "<p>Acceptez-vous que ces informations personnelles soient utilisées sur ce site ?<br>
+                    Si oui, ces données seront sauvées et rendues visibles aux autres utilisateurs (sauf le mail).<br>
+                    Si vous refusez, seules vos initiales et votre pseudo de connexion seront inscrits dans votre fiche, et votre mail sera sauvegardé mais caché aux autres utilisateurs.</p>
+                    <p>Nous rappelons aussi que nous ne faisons rien d'autre de ces données que de les afficher sur la fiche de votre profil (pas de revente, ni d'exploitation).</p>",
+                    /*
+                    * only the first character will be kept for the followed fields
+                    * each field refers to yeswiki entry field and MUST BE already defined as a key in bazar_mapping.fields
+                    */
+                    'fields_to_anonymize' => [
+                        'bf_nom',
+                        'bf_prenom'
+                    ],
+                    /*
+                        * all the content will be copied for the followed fields
+                        * each field refers to the yeswiki entry field and MUST BE already defined as a key in bazar_mapping.fields
+                        */
+                    'fields_to_keep' => [
+                        'bf_email'
+                    ],
+                    /*
+                    * in case of an anonymize user, 'bf_titre' is replaced by this value
+                    * the username will also be also with an unique word (id) according to this value. Per example, for the value 'Utilisateur anonyme',
+                    * we will have the following ids: first 'UtilisateurAnonyme', then 'UtilisateurAnonyme2' for the second user, etc.
+                    */
+                    'bf_titre_value' => 'Utilisateur anonyme'
                 ]
             ]
         ]
