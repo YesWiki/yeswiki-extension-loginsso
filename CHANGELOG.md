@@ -1,5 +1,9 @@
 # Changelog
 
+## V1.1.8
+
+Fix crash with some group sync after 4.5 migration.
+
 ## V1.1.7
 
 **WARNING : this update allow install on YesWiki 4.5 but there is some compatibility issues before YesWiki 4.5.3 when `addFinalEqual`is set to `true` which is the default value**

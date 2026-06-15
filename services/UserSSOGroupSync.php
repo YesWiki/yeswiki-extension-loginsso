@@ -3,6 +3,7 @@
 namespace YesWiki\LoginSso\Service;
 
 use YesWiki\Core\Entity\User;
+use YesWiki\Core\Service\GroupManager;
 use YesWiki\Core\Service\UserManager;
 use YesWiki\Wiki;
 
@@ -10,11 +11,13 @@ class UserSSOGroupSync
 {
     protected $userManager;
     protected $wiki;
+    protected $groupManager;
 
-    public function __construct(UserManager $userManager, Wiki $wiki)
+    public function __construct(UserManager $userManager, Wiki $wiki, GroupManager $groupManager)
     {
         $this->userManager = $userManager;
         $this->wiki = $wiki;
+        $this->groupManager = $groupManager;
     }
 
     /**
@@ -42,28 +45,34 @@ class UserSSOGroupSync
         });
 
         foreach (array_diff($ssoGroups, $userGroups) as $groupToAdd) {
-            $groupAcl = $this->wiki->GetGroupACL($groupToAdd) ?? '';
-            $groupAcl .= PHP_EOL . $user->getName();
-            $this->updateGroupAcl($groupToAdd, trim($groupAcl));
+            $members = $this->groupManager->getMembers($groupToAdd);
+            $members[] = $user->getName();
+            $this->updateGroupAcl($groupToAdd, $members);
         }
 
         foreach (array_diff($userGroups, $ssoGroups) as $groupToRemove) {
-            $groupAcl = $this->wiki->GetGroupACL($groupToRemove) ?? '';
-            $groupAcl = str_replace($user->getName(), '', $groupAcl);
-            $groupAcl = str_replace(PHP_EOL . PHP_EOL, PHP_EOL, $groupAcl);
-            $this->updateGroupAcl($groupToRemove, trim($groupAcl));
+            $members = array_diff($this->groupManager->getMembers($groupToRemove), [$user->getName()]);
+            $this->updateGroupAcl($groupToRemove, $members);
         }
     }
 
-    private function updateGroupAcl(string $group, string $acl): bool
+    private function updateGroupAcl(string $group, array $members): bool
     {
-        $result = $this->wiki->SetGroupACL($group, trim($acl));
-        if ($result) {
-            if ($result == 1000) {
-                $this->wiki->SetMessage(_t('ERROR_RECURSIVE_GROUP') . ' !');
+        $members = array_values(array_filter(array_map('trim', $members)));
+
+        try {
+            if ($this->groupManager->groupExists($group)) {
+                $this->groupManager->updateMembers($group, $members);
             } else {
-                $this->wiki->SetMessage(_t('ERROR_WHILE_SAVING_GROUP') . ' ' . ucfirst($group) . ' (' . _t('ERROR_CODE') . ' ' . $result . ')');
+                $errorCode = $this->groupManager->create($group, $members);
+                if ($errorCode === 1) {
+                    $this->wiki->SetMessage(_t('ERROR_WHILE_SAVING_GROUP') . ' ' . ucfirst($group) . ' (' . _t('ERROR_CODE') . ' ' . $errorCode . ')');
+
+                    return false;
+                }
             }
+        } catch (\Throwable $th) {
+            $this->wiki->SetMessage(_t('ERROR_WHILE_SAVING_GROUP') . ' ' . ucfirst($group) . ' (' . $th->getMessage() . ')');
 
             return false;
         }
