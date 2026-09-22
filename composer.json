@@ -1,12 +1,14 @@
 {
-  "require": {
-    "league/oauth2-client": "2.7.0"
-  },
-  "config": {
-    "platform": {
-      "php": "7.4.0"
+    "name": "yeswiki/extension-loginsso",
+    "type": "yeswiki-extension",
+    "require": {
+        "league/oauth2-client": "2.7.0"
     },
-    "platform-check": true,
-    "sort-packages": true
-  }
+    "config": {
+        "platform": {
+            "php": "7.4.0"
+        },
+        "platform-check": true,
+        "sort-packages": true
+    }
 }
