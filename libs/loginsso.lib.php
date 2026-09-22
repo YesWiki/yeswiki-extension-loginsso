@@ -242,3 +242,20 @@ function createWikiNameFromDisplayName($displayName, $charset = 'UTF-8')
 
     return $nom;
 }
+
+/** Encode les attributs SSO pour un aller-retour dans l'url, en JSON plutôt qu'en PHP sérialisé. */
+function encodeSsoAttributes($attributes)
+{
+    return json_encode($attributes, JSON_UNESCAPED_UNICODE);
+}
+
+/** Relit des attributs SSO venus de l'url, ou null si ce n'est pas un tableau JSON. */
+function decodeSsoAttributes($encoded)
+{
+    if (!is_string($encoded) || $encoded === '') {
+        return null;
+    }
+    $decoded = json_decode($encoded, true);
+
+    return is_array($decoded) ? $decoded : null;
+}

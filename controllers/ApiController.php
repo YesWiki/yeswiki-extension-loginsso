@@ -11,6 +11,7 @@ use YesWiki\Core\Service\UserManager;
 use YesWiki\Core\YesWikiController;
 
 use function YesWiki\LoginSso\Lib\bazarUserEntryExists;
+use function YesWiki\LoginSso\Lib\encodeSsoAttributes;
 use function YesWiki\LoginSso\Lib\genere_nom_user;
 
 use YesWiki\LoginSso\Service\OAuth2ProviderFactory;
@@ -183,8 +184,15 @@ class ApiController extends YesWikiController
         if (!empty($bazarMapping)) {
             $entry = bazarUserEntryExists($this->wiki->config['sso_config']['bazar_user_entry_id'], $user['name']);
             if (!$entry) {
-                $this->wiki->Redirect($this->wiki->href('createentry', 'BazaR', 'provider=' . $providerId . '&username=' . $user['name'] .
-                    ($oldUserUpdated ? '&old_user_updated=yes' : '') . '&attr=' . urlencode(serialize($ssoUser)), false));
+                $params = [
+                    'provider' => $providerId,
+                    'username' => $user['name'],
+                    'attr' => encodeSsoAttributes($ssoUser),
+                ];
+                if ($oldUserUpdated) {
+                    $params['old_user_updated'] = 'yes';
+                }
+                $this->wiki->Redirect($this->wiki->href('createentry', 'BazaR', http_build_query($params), false));
             } else {
                 // TODO voir si c'est nécessaire mais on peut ici vérifier si les données de la fiche bazar ont changées et les mettre à jour le cas échéant
                 // $GLOBALS['wiki']->SetMessage('La fiche a été mise à jour');
