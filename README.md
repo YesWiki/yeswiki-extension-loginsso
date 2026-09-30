@@ -17,7 +17,7 @@ In page `GererMisesAJour` on your YesWiki website, search extension `loginsso` a
 
 ### Usage
 
-Usage help is described in `http://example.com/?doc/#tools/loginsso/en/README.md` (replacing `http://example.com/?` by the `baseUrl` of your wiki). The same file can be found also here : https://github.com/YesWiki/yeswiki-extension-loginsso/blob/master/docs/en/README.md
+Usage help is described in `http://example.com/?doc/#/tools/loginsso/docs/en/README.md` (replacing `http://example.com/?` by the `baseUrl` of your wiki). The same file can be found also here : https://github.com/YesWiki/yeswiki-extension-loginsso/blob/doryphore/docs/en/README.md
 
 ### Warranty
 
